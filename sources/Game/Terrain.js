@@ -10,7 +10,7 @@ export class Terrain
         this.game = Game.getInstance()
 
         this.subdivision = 128
-        this.size = 192
+        this.size = 260 // Cyber City world footprint (halfExtent 130) — see audit/assets/cyber-city-layout.json
 
         if(this.game.debug.active)
         {
@@ -42,10 +42,11 @@ export class Terrain
 
         const context = canvas.getContext('2d')
 
+        // Road (low stop) -> sidewalk (high stop) grime ramp, see Phase A1 palette (audit/phase-a1-art-direction-brief.md)
         this.colors = [
-            { stop: 0.1, value: '#ffa94e' },
-            { stop: 0.3, value: '#5bc2b9' },
-            { stop: 0.9, value: '#13375f' },
+            { stop: 0.1, value: '#1c1b22' },
+            { stop: 0.5, value: '#3a3550' },
+            { stop: 0.9, value: '#2a2733' },
         ]
 
         const update = () =>
@@ -82,12 +83,14 @@ export class Terrain
 
     setNodes()
     {
-        this.grassColorUniform = uniform(color('#b8b62e'))
+        // terrainTexture channels (Cyber City convention, see audit/phase-b-implementation-notes.md):
+        // r = sidewalkMask, g = roadMask, b = heightMask (0 = road level, 1 = curb/sidewalk level)
+        this.roadTintColorUniform = uniform(color('#1c1b22'))
         this.tracksDelta = uniform(vec2(0))
 
         const worldPositionToUvNode = Fn(([position]) =>
         {
-            return position.div(this.subdivision).div(1.5).add(0.5)
+            return position.div(this.size).add(0.5)
         })
 
         this.terrainNode = Fn(([position]) =>
@@ -95,30 +98,31 @@ export class Terrain
             const textureUv = worldPositionToUvNode(position)
             const data = texture(this.game.resources.terrainTexture, textureUv)
 
-            // Wheel tracks
+            // Wheel tracks: driving off-road wears the sidewalk mask down to a road-like look
             const groundDataColor = texture(
                 this.game.tracks.renderTarget.texture,
                 position.sub(- this.game.tracks.halfSize).sub(this.tracksDelta).div(this.game.tracks.size)
             )
-            data.g.mulAssign(groundDataColor.r.oneMinus())
+            data.r.mulAssign(groundDataColor.r.oneMinus())
 
             return data
         })
-        
+
         this.colorNode = Fn(([terrainData]) =>
         {
-            // Dirt and water
+            // Road/sidewalk grime gradient, keyed by curb height (b)
             const baseColor = texture(this.gradientTexture, vec2(0, terrainData.b.oneMinus()))
 
-            // Grass
-            baseColor.assign(mix(baseColor, this.grassColorUniform, terrainData.g))
+            // Reinforce the road tint from the road mask so the procedural floor
+            // stays consistent with the dedicated road-surface material (Scenery.js)
+            baseColor.assign(mix(baseColor, this.roadTintColorUniform, terrainData.g))
 
             return baseColor.rgb
         })
 
         if(this.game.debug.active)
         {
-            this.game.debug.addThreeColorBinding(this.debugPanel, this.grassColorUniform.value, 'grassColor')
+            this.game.debug.addThreeColorBinding(this.debugPanel, this.roadTintColorUniform.value, 'roadTintColor')
         }
     }
     

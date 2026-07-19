@@ -24,10 +24,15 @@ export class Materials
 
         this.createPalette()
 
-        this.createEmissiveGradient('emissiveOrangeRadialGradient', '#ff8641', '#ff3e00', 1.7, true, this.debugPanel?.addFolder({ title: 'emissiveOrangeRadialGradient' }))
-        this.createEmissiveGradient('emissivePurpleRadialGradient', '#454bbc', '#ff2eb4', 1.7, true, this.debugPanel?.addFolder({ title: 'emissivePurpleRadialGradient' }))
-        this.createEmissiveGradient('emissiveBlueRadialGradient', '#91f0ff', '#128fff', 1.7, true, this.debugPanel?.addFolder({ title: 'emissiveBlueRadialGradient' }))
-        this.createEmissiveGradient('emissiveGreenRadialGradient', '#f8ffa6', '#74ff00', 1.5, true, this.debugPanel?.addFolder({ title: 'emissiveGreenRadialGradient' }))
+        // Phase G4: retinted to the Cyber City palette (audit/phase-a1-art-direction-brief.md).
+        // emissiveGreenRadialGradient's acid-green is reserved for the Skyline
+        // Observatory hero landmark only (CyberCityBuildingPlacements.js) -- never
+        // used on regular buildings/props; kept here as a two-tone version of
+        // that same reserved color for consistency, not for general reuse.
+        this.createEmissiveGradient('emissiveOrangeRadialGradient', '#ffcf6b', '#ffb020', 1.7, true, this.debugPanel?.addFolder({ title: 'emissiveOrangeRadialGradient' }))
+        this.createEmissiveGradient('emissivePurpleRadialGradient', '#ff2e8a', '#b3106b', 1.7, true, this.debugPanel?.addFolder({ title: 'emissivePurpleRadialGradient' }))
+        this.createEmissiveGradient('emissiveBlueRadialGradient', '#91f0ff', '#128fb0', 1.7, true, this.debugPanel?.addFolder({ title: 'emissiveBlueRadialGradient' }))
+        this.createEmissiveGradient('emissiveGreenRadialGradient', '#c3ff8d', '#8dff4f', 1.5, true, this.debugPanel?.addFolder({ title: 'emissiveGreenRadialGradient' }))
         this.createEmissiveGradient('emissiveWhiteRadialGradient', '#ffffff', '#666666', 2.7, false, this.debugPanel?.addFolder({ title: 'emissiveWhiteRadialGradient' }))
         
         this.createGradient('redGradient', '#ff3a3a', '#721551', this.debugPanel?.addFolder({ title: 'redGradient' }))
@@ -56,10 +61,14 @@ export class Materials
 
         const context = canvas.getContext('2d')
 
+        // Phase G4: retinted to a neon-fade ramp (magenta -> cyan -> void),
+        // matching the Cyber City palette. Shared by Trails.js (boost trails)
+        // and Whispers.js -- both read this generically as "glow fading to
+        // dark", which this ramp still serves, just recolored.
         const colors = [
-            { stop: 0, value: '#ffb646' },
-            { stop: 0.5, value: '#ff347e' },
-            { stop: 1, value: '#01005f' },
+            { stop: 0, value: '#ff2e8a' },
+            { stop: 0.5, value: '#28e0ff' },
+            { stop: 1, value: '#05030a' },
         ]
 
         const update = () =>
@@ -109,21 +118,36 @@ export class Materials
         }
     }
 
-    // Create materials functions
-    createEmissive(_name = 'material', _color = '#ffffff', _intensity = 3, debugPanel = null)
+    // Phase G1: shared "neon emissive" material -- a flat, normalized-brightness
+    // color with an optional flicker/pulse over time. Intended for simple
+    // single-tone neon accents (small emissive props, trim, signage) that don't
+    // need a full gradient or a bespoke per-instance shader; D7's per-window
+    // building grid and G2's wet-road shader have needs specific enough (masking,
+    // per-window randomness, fresnel) that they reasonably keep their own
+    // implementations rather than being forced through this one (see
+    // audit/phase-g-implementation-notes.md). Not currently called by any
+    // existing system (previously unused/dormant) -- available for new work.
+    createEmissive(_name = 'material', _color = '#ffffff', _intensity = 3, _flickerSpeed = 0, _flickerAmount = 0, debugPanel = null)
     {
         const baseColor = uniform(color(_color))
         const intensity = uniform(_intensity)
+        const flickerSpeed = uniform(_flickerSpeed)
+        const flickerAmount = uniform(_flickerAmount)
+        const flickerPhase = Math.random() * 1000 // fixed per material instance, so multiple neon materials don't pulse in lockstep
+
+        const flicker = this.game.ticker.elapsedScaledUniform.mul(flickerSpeed).add(flickerPhase).sin().mul(flickerAmount).add(flickerAmount.oneMinus())
 
         const material = new THREE.MeshBasicNodeMaterial({ transparent: true })
-        material.colorNode = baseColor.div(luminance(baseColor)).mul(intensity)
+        material.colorNode = baseColor.div(luminance(baseColor)).mul(intensity).mul(flicker)
         material.fog = false
         this.save(_name, material)
-  
+
         if(this.game.debug.active && debugPanel)
         {
             this.game.debug.addThreeColorBinding(debugPanel, baseColor.value, 'color')
             debugPanel.addBinding(intensity, 'value', { min: 0, max: 10, step: 0.01 })
+            debugPanel.addBinding(flickerSpeed, 'value', { label: 'flickerSpeed', min: 0, max: 5, step: 0.01 })
+            debugPanel.addBinding(flickerAmount, 'value', { label: 'flickerAmount', min: 0, max: 0.5, step: 0.01 })
         }
 
         return material

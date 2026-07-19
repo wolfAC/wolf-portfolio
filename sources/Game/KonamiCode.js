@@ -1,6 +1,7 @@
 import * as THREE from 'three/webgpu'
 import { Game } from './Game.js'
 import { VisualVehicle } from './World/VisualVehicle.js'
+import { buildVehicleModel } from './World/VehicleModel.js'
 
 export class KonamiCode
 {
@@ -49,19 +50,12 @@ export class KonamiCode
         document.addEventListener('keydown', callback)
     }
 
-    async activate()
+    activate()
     {
-        const files = [
-            'vehicle/oldSchool.glb',
-            'vehicle/default.glb'
-        ]
-        
-        const resources = await this.game.resourcesLoader.load([
-            [ 'vehicle', `${files[this.activationCount % 2]}?cb=${this.activationCount}`, 'gltf' ],
-        ])
-            
+        const variants = [ 'oldSchool', 'default' ]
+
         this.game.world.visualVehicle.destroy()
-        this.game.world.visualVehicle = new VisualVehicle(resources.vehicle.scene)
+        this.game.world.visualVehicle = new VisualVehicle(buildVehicleModel(variants[this.activationCount % 2]))
 
         if(this.game.world.confetti)
         {

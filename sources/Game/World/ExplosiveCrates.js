@@ -1,7 +1,19 @@
 import * as THREE from 'three/webgpu'
 import gsap from 'gsap'
+import { color } from 'three/tsl'
 import { Game } from '../Game.js'
 import { InstancedGroup } from '../InstancedGroup.js'
+import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
+import { scatterNearDistricts } from './CyberCityPropPlacements.js'
+
+// Phase E: explosive canisters, reskinned in place (same class/property name
+// and reset()/achievement hooks -- Game.js's reset() and the 'explosiveCrates'
+// achievement (sources/data/achievements.js, hard-coded target of 20) both
+// depend on this class as-is). Procedural geometry (no glTF) placed near every
+// district instead of Bruno Simon's hand-placed positions; 4 per district x 6
+// districts = 24 canisters, comfortably above the achievement's target of 20.
+const RADIUS = 0.4
+const HEIGHT = 0.9
 
 export class ExplosiveCrates
 {
@@ -9,22 +21,31 @@ export class ExplosiveCrates
     {
         this.game = Game.getInstance()
 
-        // Base and references
-        const [ base, references ] = InstancedGroup.getBaseAndReferencesFromInstances(this.game.resources.explosiveCratesModel.scene.children)
-        this.references = references
-        
-        // Setup base
-        base.castShadow = true
-        base.receiveShadow = true
+        const base = new THREE.Group()
 
-        // Update materials 
-        this.game.materials.updateObject(base)
+        const geometry = new THREE.CylinderGeometry(RADIUS * 0.9, RADIUS, HEIGHT, 12)
+        geometry.translate(0, HEIGHT / 2, 0)
+        const canister = new THREE.Mesh(geometry, new MeshDefaultMaterial({ colorNode: color('#ffb020') }))
+        canister.name = 'canister'
+        canister.castShadow = true
+        canister.receiveShadow = true
+        base.add(canister)
+
+        this.references = []
+        for(const placement of scatterNearDistricts('explosiveCanisters', 4, 5, 12))
+        {
+            const reference = new THREE.Object3D()
+            reference.position.set(placement.position.x, 0, placement.position.z)
+            reference.rotation.y = placement.rotationY
+            reference.needsUpdate = true
+            this.references.push(reference)
+        }
 
         // Create instanced group
         this.instancedGroup = new InstancedGroup(this.references, base)
 
         this.items = []
-        
+
         let i = 0
         for(const reference of this.references)
         {
@@ -43,7 +64,7 @@ export class ExplosiveCrates
                     friction: 0.7,
                     mass: 0.02,
                     sleeping: true,
-                    colliders: [ { shape: 'cuboid', parameters: [ 0.5, 0.5, 0.5 ], category: 'object' } ],
+                    colliders: [ { shape: 'cuboid', parameters: [ RADIUS, HEIGHT / 2, RADIUS ], position: { x: 0, y: HEIGHT / 2, z: 0 }, category: 'object' } ],
                     waterGravityMultiplier: - 1,
                     contactThreshold: 0,
                     onCollision: () =>
@@ -159,13 +180,12 @@ export class ExplosiveCrates
                 crate.object.physical.body.setEnabled(true)
             })
         }
-        
+
         this.instancedGroup.needsUpdate = true
 
         // Disable every other object to prevent explosion trigger
         this.game.objects.list.forEach((object) =>
         {
-            // console.log(this.game.objects)
             if(
                 object.physical &&
                 (object.physical.type === 'dynamic' || object.physical.type === 'kinematicPositionBased') &&

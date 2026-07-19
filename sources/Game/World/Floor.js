@@ -44,8 +44,8 @@ export class Floor
 
         // Terrain data
         const terrainData = this.game.terrain.terrainNode(positionWorld.xz)
-        const slabHighColor = uniform(color('#ffcf8b'))
-        const slabLowColor = uniform(color('#a87762'))
+        const slabHighColor = uniform(color('#3a3550'))
+        const slabLowColor = uniform(color('#151420'))
         const slabTextureFrequency = uniform(0.175)
         const slabNoiseFrequency = uniform(0.03)
         const colorNode = Fn(() =>
@@ -75,13 +75,13 @@ export class Floor
             hasLightBounce: false,
             wireframe: false
         })
-        // Displacement
+        // Displacement: curb step up from road level (b=0) to sidewalk/plaza level (b=1)
         material.positionNode = Fn(() =>
         {
             const uvDim = min(min(uv().x, uv().y).mul(20), 1)
 
             const newPosition = positionLocal
-            newPosition.y.addAssign(terrainData.b.mul(-1.5).mul(uvDim))
+            newPosition.y.addAssign(terrainData.b.mul(0.15).mul(uvDim))
 
             return newPosition
         })()

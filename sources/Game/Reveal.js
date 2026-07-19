@@ -92,10 +92,6 @@ export class Reveal
                     this.game.world.intro.showLabel()
                 })
 
-                // Cherry trees
-                if(this.game.world.cherryTrees)
-                    this.game.world.cherryTrees.leaves.seeThroughMultiplier = 0.5
-
                 // Click
                 if(location.hash.match(/skip/i))
                 {
@@ -193,20 +189,6 @@ export class Reveal
                     }
                 }
             )
-
-            // Cherry trees
-            if(this.game.world.cherryTrees)
-            {
-                gsap.to(
-                    this.game.world.cherryTrees.leaves,
-                    {
-                        seeThroughMultiplier: 1,
-                        ease: 'power1.inOut',
-                        duration: 2 / speedMultiplier,
-                        overwrite: true
-                    }
-                )
-            }
         }
         else if(step === 2)
         {

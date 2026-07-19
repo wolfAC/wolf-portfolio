@@ -2,7 +2,6 @@ import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
 import { Floor } from './Floor.js'
 import { Grid } from './Grid.js'
-import { Grass } from './Grass.js'
 import { color, float, Fn, instance, normalWorld, positionLocal, texture, vec3, vec4 } from 'three/tsl'
 import { WaterSurface } from './WaterSurface.js'
 import { Areas } from './Areas/Areas.js'
@@ -13,10 +12,7 @@ import { Snow } from './Snow.js'
 import { Whispers } from './Whispers.js'
 import { VisualVehicle } from './VisualVehicle.js'
 import { VisualTornado } from './VisualTornado.js'
-import { Flowers } from './Flowers.js'
-import { Bricks } from './Bricks.js'
-import { Trees } from './Trees.js'
-import { Bushes } from './Bushes.js'
+import { ScrapCrates } from './ScrapCrates.js'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { Fireballs } from './Fireballs.js'
 import { ExplosiveCrates } from './ExplosiveCrates.js'
@@ -24,10 +20,13 @@ import { RainLines } from './RainLines.js'
 import { Confetti } from './Confetti.js'
 import { Intro } from './Intro.js'
 import { PoleLights } from './PoleLights.js'
-import { Lanterns } from './Lanterns.js'
-import { Fences } from './Fences.js'
-import { Benches } from './Benches.js'
+import { HoloSigns } from './HoloSigns.js'
+import { Barricades } from './Barricades.js'
+import { VendingMachines } from './VendingMachines.js'
 import { Scenery } from './Scenery.js'
+import { Roads } from './Roads.js'
+import { Buildings } from './Buildings.js'
+import { buildVehicleModel } from './VehicleModel.js'
 
 export class World
 {
@@ -53,10 +52,10 @@ export class World
         }
         else if(step === 1)
         {
-            this.visualVehicle = new VisualVehicle(this.game.resources.vehicle.scene)
+            this.visualVehicle = new VisualVehicle(buildVehicleModel('default'))
             this.floor = new Floor()
+            this.roads = new Roads()
             this.waterSurface = new WaterSurface()
-            this.grass = new Grass()
             this.windLines = new WindLines()
             this.confetti = new Confetti()
             this.leaves = new Leaves()
@@ -65,18 +64,14 @@ export class World
             this.fireballs = new Fireballs()
             this.snow = new Snow()
             this.visualTornado = new VisualTornado()
-            this.bushes = new Bushes()
-            this.birchTrees = new Trees('Birch Tree', this.game.resources.birchTreesVisualModel.scene, this.game.resources.birchTreesReferencesModel.scene.children, '#ff4f2b', '#ff903f')
-            this.oakTrees = new Trees('Oak Tree', this.game.resources.oakTreesVisualModel.scene, this.game.resources.oakTreesReferencesModel.scene.children, '#b4b536', '#d8cf3b')
-            this.cherryTrees = new Trees('Cherry Tree', this.game.resources.cherryTreesVisualModel.scene, this.game.resources.cherryTreesReferencesModel.scene.children, '#ff6d6d', '#ff9990')
-            this.flowers = new Flowers()
-            this.bricks = new Bricks()
-            this.fences = new Fences()
-            this.benches = new Benches()
+            this.scrapCrates = new ScrapCrates()
+            this.barricades = new Barricades()
+            this.vendingMachines = new VendingMachines()
             this.explosiveCrates = new ExplosiveCrates()
             this.poleLights = new PoleLights()
-            this.lanterns = new Lanterns()
+            this.holoSigns = new HoloSigns()
             this.scenery = new Scenery()
+            this.buildings = new Buildings()
             this.areas = new Areas()
         }
         else if(step === 2)

@@ -27,12 +27,12 @@ export class Grid
         const lines = [
             // new MeshGridMaterialLine(0x705df2, 1, 0.03, 0.2),
             // new MeshGridMaterialLine(0xffffff, 10, 0.003, 1),
-            new MeshGridMaterialLine('#8d55ff', 10, 0.02, 0.2),
-            new MeshGridMaterialLine('#675369', 100, 0.002, 1),
+            new MeshGridMaterialLine('#28e0ff', 10, 0.02, 0.2),
+            new MeshGridMaterialLine('#3a3550', 100, 0.002, 1),
         ]
 
         const uvGridMaterial = new MeshGridMaterial({
-            color: 0x1b191f,
+            color: 0x151420,
             scale: 0.001,
             antialiased: true,
             reference: 'uv', // uv | world
