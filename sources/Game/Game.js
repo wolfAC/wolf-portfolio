@@ -39,14 +39,12 @@ import { RayCursor } from './RayCursor.js'
 import { Water } from './Water.js'
 import { Reveal } from './Reveal.js'
 import { KonamiCode } from './KonamiCode.js'
-import { Achievements } from './Achievements.js'
 import { Notifications } from './Notifications.js'
 import { Quality } from './Quality.js'
 import { Menu } from './Menu.js'
 import { Title } from './Title.js'
 import { PreRenderer } from './PreRenderer.js'
 import { Options } from './Options.js'
-import gsap from 'gsap'
 import { Map } from './Map.js'
 
 export class Game
@@ -176,7 +174,6 @@ export class Game
         this.closingManager = new ClosingManager()
         this.interactivePoints = new InteractivePoints()
         this.konamiCode = new KonamiCode()
-        this.achievements = new Achievements()
         this.tornado = new Tornado()
         this.map = new Map()
         this.title = new Title()
@@ -192,12 +189,6 @@ export class Game
         {
             this.reveal.updateStep(0)
         })
-
-        // Debug achievement
-        if(this.debug.active)
-        {
-            this.achievements.setProgress('debug', 1)
-        }
     }
 
     reset()
@@ -227,13 +218,6 @@ export class Game
             if(this.world.areas.toilet)
                 this.world.areas.toilet.cabin.down = false
 
-            // Social
-            if(this.world.areas.social)
-            {
-                this.world.areas.social.statue.down = false
-                this.world.areas.social.fans.instancedGroup.needsUpdate = true
-            }
-            
             // Vending machines
             if(this.world.vendingMachines)
                 this.world.vendingMachines.instancedGroup.needsUpdate = true
@@ -249,12 +233,6 @@ export class Game
             // Holo signs
             if(this.world.holoSigns)
                 this.world.holoSigns.instancedGroup.needsUpdate = true
-
-            // Achievement
-            gsap.delayedCall(2, () =>
-            {
-                this.achievements.setProgress('reset', 1)
-            })
         })
     }
 }

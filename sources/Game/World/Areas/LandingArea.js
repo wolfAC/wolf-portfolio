@@ -18,7 +18,6 @@ export class LandingArea extends Area
         this.setKiosk()
         this.setControls()
         this.setBonfire()
-        this.setAchievement()
     }
 
     setLetters()
@@ -252,18 +251,6 @@ export class LandingArea extends Area
                 this.game.inputs.interactiveButtons.removeItems(['interact'])
             }
         )
-    }
-
-    setAchievement()
-    {
-        this.events.on('boundingIn', () =>
-        {
-            this.game.achievements.setProgress('areas', 'landing')
-        })
-        this.events.on('boundingOut', () =>
-        {
-            this.game.achievements.setProgress('landingLeave', 1)
-        })
     }
 
     update()

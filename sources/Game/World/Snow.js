@@ -10,7 +10,6 @@ export class Snow
     {
         this.game = Game.getInstance()
 
-        this.achievementAchieved = this.game.achievements.groups.get('weatherSnow')?.items[0].achieved
         this.size = this.game.view.optimalArea.radius * 2
         this.halfSize = this.size * 0.5
         this.subdivisions = 256
@@ -428,13 +427,6 @@ export class Snow
         {
             // Apply weather
             this.mesh.visible = true
-
-            // Achievement
-            if(!this.achievementAchieved && this.game.reveal.step === 2 && this.elevation.value > 0)
-            {
-                this.achievementAchieved = true
-                this.game.achievements.setProgress('weatherSnow', 1)
-            }
 
             // Glitter
             // this.glitterPositionDelta.value = 1 + (this.game.view.camera.position.x + this.game.view.camera.position.z) * this.glitterViewMultiplier + this.game.ticker.elapsedScaled * 0.4

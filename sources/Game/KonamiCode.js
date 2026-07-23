@@ -65,8 +65,5 @@ export class KonamiCode
         }
 
         this.activationCount++
-
-        // Achievement
-        this.game.achievements.setProgress('konami', 1)
     }
 }

@@ -27,12 +27,6 @@ ${AUTHOR_NAME.toUpperCase()}'S PORTFOLIO
 ║ enabling the use of both WebGL and WebGPU, making this portfolio possible.
 ╚═══════════════════════╝
 
-╔═ Three.js Journey ════╗
-║ If you want to learn Three.js, this huge course has you covered.
-║ https://threejs-journey.com/
-║ It contains everything you need to start building awesome stuff with Three.js (and much more).
-╚═══════════════════════╝
-
 ╔═ Source code ═════════╗
 ║ The code is available on GitHub under MIT license. Even the Blender files are there, so have fun!
 ║ ${REPO_URL}

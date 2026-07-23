@@ -23,7 +23,6 @@ export class CareerArea extends Area
         this.setSounds()
         this.setLines()
         this.setYears()
-        this.setAchievement()
     }
 
     setSounds()
@@ -255,14 +254,6 @@ export class CareerArea extends Area
         // mesh.position.z = -30
         // mesh.position.x = -10
         // this.game.scene.add(mesh)
-    }
-
-    setAchievement()
-    {
-        this.events.on('boundingIn', () =>
-        {
-            this.game.achievements.setProgress('areas', 'career')
-        })
     }
 
     update()

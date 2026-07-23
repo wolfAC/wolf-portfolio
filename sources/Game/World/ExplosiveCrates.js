@@ -7,11 +7,9 @@ import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { scatterNearDistricts } from './CyberCityPropPlacements.js'
 
 // Phase E: explosive canisters, reskinned in place (same class/property name
-// and reset()/achievement hooks -- Game.js's reset() and the 'explosiveCrates'
-// achievement (sources/data/achievements.js, hard-coded target of 20) both
-// depend on this class as-is). Procedural geometry (no glTF) placed near every
-// district instead of Bruno Simon's hand-placed positions; 4 per district x 6
-// districts = 24 canisters, comfortably above the achievement's target of 20.
+// and reset() hook -- Game.js's reset() depends on this class as-is).
+// Procedural geometry (no glTF) placed near every district instead of hand-placed
+// positions; 4 per district x 6 districts = 24 canisters.
 const RADIUS = 0.4
 const HEIGHT = 0.9
 
@@ -162,9 +160,6 @@ export class ExplosiveCrates
             this.game.objects.disable(crate.object)
             crate.object.visual.object3D.position.y += 100 // Hide the instance reference
             crate.object.visual.object3D.needsUpdate = true
-
-            // Achievements
-            this.game.achievements.setProgress('explosiveCrates', crate.id)
         })
     }
 

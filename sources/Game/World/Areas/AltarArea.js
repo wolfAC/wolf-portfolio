@@ -33,7 +33,6 @@ export class AltarArea extends Area
         this.setCounter()
         this.setDeathZone()
         this.setData()
-        this.setAchievement()
 
         // Offline counter
         if(!this.game.server.connected)
@@ -409,7 +408,6 @@ export class AltarArea extends Area
                 {
                     this.sounds.deathBell1.play()
                 })
-                this.game.achievements.setProgress('sacrifice', 1)
             }
         )
     }
@@ -507,11 +505,4 @@ export class AltarArea extends Area
         )
     }
 
-    setAchievement()
-    {
-        this.events.on('boundingIn', () =>
-        {
-            this.game.achievements.setProgress('areas', 'altar')
-        })
-    }
 }

@@ -31,7 +31,6 @@ export class CookieArea extends Area
         this.setActualCookies()
         this.setInteractivePoint()
         this.setCounter()
-        this.setAchievement()
     }
 
     setSound()
@@ -451,14 +450,6 @@ export class CookieArea extends Area
         })
     }
 
-    setAchievement()
-    {
-        this.events.on('boundingIn', () =>
-        {
-            this.game.achievements.setProgress('areas', 'cookie')
-        })
-    }
-
     accept()
     {
         // Cookies
@@ -495,9 +486,6 @@ export class CookieArea extends Area
 
         // Actual cookie
         document.cookie = `acceptedCookies=${++this.actualCookies.count}`
-
-        // Achievement
-        this.game.achievements.addProgress('cookie')
     }
 
     update()

@@ -318,9 +318,6 @@ export class Whispers
                 // Close menu
                 this.game.menu.close()
 
-                // Achievement
-                this.game.achievements.setProgress('whisper', 1)
-
                 // Sound
                 gsap.delayedCall(0.3, () =>
                 {

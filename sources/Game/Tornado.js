@@ -15,7 +15,6 @@ export class Tornado
         this.strength = 0
         this.resolution = 100
         this.position = new THREE.Vector3()
-        this.achievementAchieved = this.game.achievements.groups.get('cataclysm')?.items[0].achieved
 
         // Debug
         if(this.game.debug.active)
@@ -235,11 +234,6 @@ export class Tornado
         const distance = toTornado.length()
         
         const strength = remapClamp(distance, 20, 2, 0, 1)
-        if(!this.achievementAchieved && strength > 0.5)
-        {
-            this.achievementAchieved = true
-            this.game.achievements.setProgress('cataclysm', 1)
-        }
 
         const force = toTornado.clone().normalize()
 

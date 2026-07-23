@@ -7,6 +7,12 @@ import { References } from '../References.js'
 // road shape on top of/crossing through the new one.
 const RETIRED_CHILD_NAME_PATTERN = /^ref(?:erence)?road$/i
 
+// The bridge structure (`bridgePhysicalFixed` / `bridgePhysicalFixed.001`) baked
+// into scenery.glb belongs to the old map layout and has no equivalent in the
+// Cyber City road network, so it's skipped entirely (both its visual mesh and
+// physics body come from the same node via addFromModel below).
+const RETIRED_BRIDGE_NAME_PATTERN = /^bridge/i
+
 export class Scenery
 {
     constructor()
@@ -17,7 +23,7 @@ export class Scenery
         const model = [...this.game.resources.sceneryModel.scene.children]
         for(const child of model)
         {
-            if(RETIRED_CHILD_NAME_PATTERN.test(child.name))
+            if(RETIRED_CHILD_NAME_PATTERN.test(child.name) || RETIRED_BRIDGE_NAME_PATTERN.test(child.name))
                 continue
 
             // Add

@@ -10,7 +10,6 @@ export class TimeMachineArea extends Area
         super(model)
 
         this.setTV()
-        this.setAchievement()
     }
 
     setTV()
@@ -80,11 +79,4 @@ export class TimeMachineArea extends Area
         screenMesh.material = material
     }
 
-    setAchievement()
-    {
-        this.events.on('boundingIn', () =>
-        {
-            this.game.achievements.setProgress('areas', 'timeMachine')
-        })
-    }
 }

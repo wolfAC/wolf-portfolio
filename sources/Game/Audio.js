@@ -488,25 +488,6 @@ export class Audio
             }
         }
 
-        // Campfire (Lab Area + Bonfire Area)
-        {
-            const positions = []
-            if(this.game.world.areas?.lab)
-                positions.push(this.game.world.areas.lab.references.items.get('fire')[0].position)
-
-            if(positions.length)
-            {
-                this.game.audio.register({
-                    group: 'campfire',
-                    path: 'sounds/fire/Fire Burning.mp3',
-                    autoplay: true,
-                    loop: true,
-                    volume: 1,
-                    positions: positions,
-                    distanceFade: 13,
-                })
-            }
-        }
     }
 
     setOneOffs()

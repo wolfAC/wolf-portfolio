@@ -35,7 +35,6 @@ export class Player
         this.setDistanceDriven()
         this.setUnstuck()
         // this.setBackWheel()
-        this.setFlip()
         this.setTimePlayed()
 
         this.game.physicalVehicle.chassis.physical.initialState.position.x = respawn.position.x
@@ -362,12 +361,8 @@ export class Player
             {
                 // Sound
                 this.sounds.suspensions.play(activeCount)
-
-                // Not a jump => Achievement
-                if(!this.game.inputs.actions.get('suspensions').active)
-                    this.game.achievements.addProgress('suspensions')
             }
-                
+
         }
 
         this.game.inputs.events.on('suspensions', suspensionsUpdate)
@@ -452,10 +447,6 @@ export class Player
                     // Sound
                     this.sounds.suspensions.play(4)
 
-                    // Achievement
-                    if(this.game.physicalVehicle.upsideDown.ratio > 0.75)
-                        this.game.achievements.setProgress('upsideDown', 1)
-
                     // Again in case it didn't work
                     waitAndTest()
                 }
@@ -521,24 +512,11 @@ export class Player
     //     })
     // }
 
-    setFlip()
-    {
-        this.game.physicalVehicle.events.on('flip', (direction) =>
-        {
-            if(direction > 0)
-                this.game.achievements.setProgress('frontFlip', 1)
-            else
-                this.game.achievements.setProgress('backFlip', 1)
-        })
-    }
-
     setTimePlayed()
     {
         const localTimePlayed = localStorage.getItem('timePlayed')
         this.timePlayed = {}
         this.timePlayed.all = localTimePlayed ? parseFloat(localTimePlayed) : 0
-        this.timePlayed.session = 0
-        this.timePlayed.achieved = false
 
         setInterval(() =>
         {
@@ -594,9 +572,6 @@ export class Player
                 this.suspensions[ randomWheelIndex ] = previousState
             }
         })
-
-        // Achievement
-        this.game.achievements.addProgress('honk')
     }
 
     updatePrePhysics()
@@ -723,29 +698,6 @@ export class Player
 
         // Time played
         this.timePlayed.all += this.game.ticker.delta
-        this.timePlayed.session += this.game.ticker.delta
-
-        if(!this.timePlayed.achieved && this.timePlayed.session > this.game.dayCycles.duration)
-        {
-            this.timePlayed.achieved = true
-            this.game.achievements.setProgress('fullDay', 1)
-        }
-
-        // Sea achievement
-        const distanceToCenter = this.position2.length()
-        if(distanceToCenter > 120)
-            this.game.achievements.setProgress('sea', 1)
-
-        // Go high achievements
-        const elevation = Math.floor(this.position.y)
-        if(this.game.achievements.groups.get('goHigh') && elevation > this.game.achievements.groups.get('goHigh').progress)
-            this.game.achievements.setProgress('goHigh', elevation)
-
-        // // Speed achievement
-        // const speedKmPerHour = Math.floor(this.game.physicalVehicle.xzSpeed / 1000 * 3600)
-
-        // if(this.game.achievements.groups.get('speed') && speedKmPerHour > this.game.achievements.groups.get('speed').progress)
-        //     this.game.achievements.setProgress('speed', speedKmPerHour)
 
         // Distance driven
         this.distanceDriven.value += this.game.physicalVehicle.xzSpeed * this.game.ticker.deltaScaled
@@ -755,15 +707,6 @@ export class Player
         {
             localStorage.setItem('distanceDriven', flooredDistanceDriven)
             this.distanceDriven.floored = flooredDistanceDriven
-        }
-        
-        // Achievement
-        const distanceDrivenKm = Math.floor(this.distanceDriven.value / 1000)
-
-        if(this.game.achievements.groups.get('distanceDriven') && distanceDrivenKm > this.game.achievements.groups.get('distanceDriven').progress)
-        {
-            this.game.achievements.setProgress('distanceDriven', distanceDrivenKm)
-
         }
     }
 }

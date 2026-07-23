@@ -10,7 +10,6 @@ export class ToiletArea extends Area
 
         this.setCabin()
         this.setCandleFlames()
-        this.setAchievement()
     }
 
     setCabin()
@@ -31,14 +30,6 @@ export class ToiletArea extends Area
         })
     }
 
-    setAchievement()
-    {
-        this.events.on('boundingIn', () =>
-        {
-            this.game.achievements.setProgress('areas', 'toilet')
-        })
-    }
-
     update()
     {
         if(!this.cabin.down && !this.cabin.body.isSleeping())
@@ -46,10 +37,7 @@ export class ToiletArea extends Area
             const cabinUp = new THREE.Vector3(0, 1, 0)
             cabinUp.applyQuaternion(this.cabin.body.rotation())
             if(cabinUp.y < 0.4)
-            {
                 this.cabin.down = true
-                this.game.achievements.setProgress('toiletDown', 1)
-            }
         }
     }
 }

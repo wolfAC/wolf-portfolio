@@ -245,13 +245,7 @@ export class VisualVehicle
             }
         }
         
-        // From achievemnts
-        this.paints.changeTo(this.game.achievements.rewards.current.name)
-
-        this.game.achievements.events.on('rewardActiveChange', (reward) =>
-        {
-            this.paints.changeTo(reward.name)
-        })
+        this.paints.changeTo()
     }
 
     setMainGroundTrack()

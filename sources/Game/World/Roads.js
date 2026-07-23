@@ -143,7 +143,15 @@ export class Roads
             64
         )
 
-        // Radial avenues (hub -> ring) and gate spurs (ring -> district), one pair per district
+        // Radial avenues (hub -> ring) and gate spurs (ring -> district), one pair per district.
+        // Both stop at the ring annulus's edge (inner edge for the inbound avenue, outer
+        // edge for the outbound spur) rather than its centerline radius -- ending at the
+        // centerline would run each quad halfway across the annulus's own width, doubling
+        // up geometry with the annulus there and z-fighting against it (visible as
+        // flickering at every avenue/spur <-> ring junction).
+        const ringInnerRadius = this.layout.ringRoad.radius - this.layout.ringRoad.width / 2
+        const ringOuterRadius = this.layout.ringRoad.radius + this.layout.ringRoad.width / 2
+
         for(const district of this.layout.districts)
         {
             const angle = district.angleDeg * (Math.PI / 180)
@@ -152,23 +160,27 @@ export class Roads
 
             const hubEdgeX = this.layout.hub.radius * cos
             const hubEdgeZ = this.layout.hub.radius * sin
-            const ringX = this.layout.ringRoad.radius * cos
-            const ringZ = this.layout.ringRoad.radius * sin
+            const ringInnerX = ringInnerRadius * cos
+            const ringInnerZ = ringInnerRadius * sin
+            const ringOuterX = ringOuterRadius * cos
+            const ringOuterZ = ringOuterRadius * sin
 
-            pushQuad(hubEdgeX, hubEdgeZ, ringX, ringZ, this.layout.radialAvenues.width / 2)
+            pushQuad(hubEdgeX, hubEdgeZ, ringInnerX, ringInnerZ, this.layout.radialAvenues.width / 2)
 
             const innerRadius = district.radius - district.footprintRadius
-            pushQuad(ringX, ringZ, innerRadius * cos, innerRadius * sin, this.layout.gateSpurs.width / 2)
+            pushQuad(ringOuterX, ringOuterZ, innerRadius * cos, innerRadius * sin, this.layout.gateSpurs.width / 2)
         }
 
-        // Alley connectors (ring -> alley node)
+        // Alley connectors (ring -> alley node). Alley nodes sit inside the ring
+        // (see CyberCityLayout.js), so like radial avenues these start at the ring's
+        // inner edge, not its centerline, for the same reason as above.
         for(const alley of this.layout.alleyNodes)
         {
             const angle = alley.angleDeg * (Math.PI / 180)
-            const ringX = this.layout.ringRoad.radius * Math.cos(angle)
-            const ringZ = this.layout.ringRoad.radius * Math.sin(angle)
+            const ringInnerX = ringInnerRadius * Math.cos(angle)
+            const ringInnerZ = ringInnerRadius * Math.sin(angle)
 
-            pushQuad(ringX, ringZ, alley.position.x, alley.position.z, this.layout.alleyConnectors.width / 2)
+            pushQuad(ringInnerX, ringInnerZ, alley.position.x, alley.position.z, this.layout.alleyConnectors.width / 2)
         }
 
         this.geometry = new THREE.BufferGeometry()
@@ -269,6 +281,16 @@ export class Roads
             hasWater: false,
             side: THREE.DoubleSide,
         })
+
+        // The road is a purely visual overlay with no physics collider of its
+        // own (see the class comment) -- dynamic props (Barricades, ScrapCrates)
+        // rest/topple against the terrain collider underneath instead, so a
+        // knocked-over prop lying near/on a road can end up almost exactly
+        // coplanar with this mesh. Biasing the road toward the camera makes it
+        // reliably win that depth tie instead of flickering against the prop.
+        this.material.polygonOffset = true
+        this.material.polygonOffsetFactor = -4
+        this.material.polygonOffsetUnits = -4
     }
 
     setMesh()

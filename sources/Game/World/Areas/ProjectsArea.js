@@ -52,7 +52,6 @@ export class ProjectsArea extends Area
         this.setOven()
         this.setGrinder()
         this.setAnvil()
-        this.setAchievement()
 
         this.changeProject(0, ProjectsArea.DIRECTION_NEXT, false, true)
 
@@ -1285,14 +1284,6 @@ export class ProjectsArea extends Area
         this.anvil.blade.material = material
     }
 
-    setAchievement()
-    {
-        this.events.on('boundingIn', () =>
-        {
-            this.game.achievements.setProgress('areas', 'projects')
-        })
-    }
-
     open()
     {
         if(this.state === ProjectsArea.STATE_OPEN || this.state === ProjectsArea.STATE_OPENING)
@@ -1352,9 +1343,6 @@ export class ProjectsArea extends Area
         const sound = this.game.audio.groups.get('click')
         if(sound)
             sound.play(true)
-
-        // Achievements
-        this.game.achievements.setProgress('projects', this.navigation.current.title)
     }
 
     close()
@@ -1507,10 +1495,6 @@ export class ProjectsArea extends Area
         }
 
         this.changeImage(imageIndex, direction, silent)
-
-        // Achievements
-        if(this.state === ProjectsArea.STATE_OPEN)
-            this.game.achievements.setProgress('projects', this.navigation.current.title)
     }
 
     changeImage(imageIndex = 0, direction = null, silent = false)

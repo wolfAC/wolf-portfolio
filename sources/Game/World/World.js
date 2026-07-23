@@ -25,7 +25,6 @@ import { Barricades } from './Barricades.js'
 import { VendingMachines } from './VendingMachines.js'
 import { Scenery } from './Scenery.js'
 import { Roads } from './Roads.js'
-import { Buildings } from './Buildings.js'
 import { buildVehicleModel } from './VehicleModel.js'
 
 export class World
@@ -71,7 +70,6 @@ export class World
             this.poleLights = new PoleLights()
             this.holoSigns = new HoloSigns()
             this.scenery = new Scenery()
-            this.buildings = new Buildings()
             this.areas = new Areas()
         }
         else if(step === 2)

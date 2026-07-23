@@ -439,11 +439,8 @@ export class Lightnings
             this.sounds.near[Math.floor(Math.random() * this.sounds.near.length)].play(coordinates)
 
             // Game explosion
-            const vehicleHit = this.game.explosions.explode(coordinates, 7, 4, true)
+            this.game.explosions.explode(coordinates, 7, 4, true)
 
-            if(this.game.reveal.step === 2 && vehicleHit)
-                this.game.achievements.setProgress('lightning', 1)
-            
             // Arc
             disposables.push(this.arc.create(coordinates, rng))
 

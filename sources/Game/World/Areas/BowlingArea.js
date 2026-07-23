@@ -31,7 +31,6 @@ export class BowlingArea extends Area
         this.setScreen()
         this.setBumpers()
         this.setJukebox()
-        this.setAchievement()
     }
 
     setSounds()
@@ -515,14 +514,6 @@ export class BowlingArea extends Area
         }
     }
 
-    setAchievement()
-    {
-        this.events.on('boundingIn', () =>
-        {
-            this.game.achievements.setProgress('areas', 'bowling')
-        })
-    }
-
     update()
     {
         let showRestartInteractivePoint = false
@@ -598,10 +589,6 @@ export class BowlingArea extends Area
                         this.game.world.confetti.pop(this.screen.group.position.clone().add(new THREE.Vector3(- 1, - 1, 0)))
                         this.game.world.confetti.pop(this.screen.group.position.clone().add(new THREE.Vector3(- 3.4, - 1, 0)))
                     }
-
-                    this.game.achievements.sounds.achieve.play()
-
-                    this.game.achievements.setProgress('strike', 1)
                 }
             }
         }
