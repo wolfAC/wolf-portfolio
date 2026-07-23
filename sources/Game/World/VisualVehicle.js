@@ -24,6 +24,7 @@ export class VisualVehicle
         this.setAntenna()
         this.setBoostTrails()
         this.setBoostAnimation()
+        this.setGuns()
         this.setScreenPosition()
         this.setPaints()
 
@@ -43,6 +44,9 @@ export class VisualVehicle
             this.game.inputs.events.off('left', this.blinkers.leftCallback)
             this.game.inputs.events.off('right', this.blinkers.rightCallback)
         }
+
+        if(this.guns)
+            this.game.physicalVehicle.events.off('gunFire', this.guns.fireCallback)
 
         for(let partName in this.parts)
         {
@@ -75,6 +79,10 @@ export class VisualVehicle
             'cell2',
             'cell3',
             'energy',
+            'gunBarrelLeft',
+            'gunBarrelRight',
+            'muzzleFlashLeft',
+            'muzzleFlashRight',
         ]
         for(let i = 0; i < searchList.length; i++)
         {
@@ -408,6 +416,44 @@ export class VisualVehicle
 
             this.parts.energy.material = material
         }
+    }
+
+    setGuns()
+    {
+        if(!this.parts.gunBarrelLeft || !this.parts.gunBarrelRight)
+            return
+
+        this.guns = {}
+        this.guns.barrels = [ this.parts.gunBarrelLeft, this.parts.gunBarrelRight ]
+        this.guns.flashes = [ this.parts.muzzleFlashLeft, this.parts.muzzleFlashRight ]
+        this.guns.restX = this.guns.barrels.map((barrel) => barrel.position.x)
+
+        for(const flash of this.guns.flashes)
+        {
+            if(flash)
+                flash.visible = false
+        }
+
+        this.guns.fireCallback = ({ barrelIndex }) =>
+        {
+            const barrel = this.guns.barrels[barrelIndex]
+            const flash = this.guns.flashes[barrelIndex]
+
+            if(barrel)
+            {
+                gsap.killTweensOf(barrel.position)
+                barrel.position.x = this.guns.restX[barrelIndex] - 0.08
+                gsap.to(barrel.position, { x: this.guns.restX[barrelIndex], duration: 0.12, ease: 'power2.out' })
+            }
+
+            if(flash)
+            {
+                flash.visible = true
+                gsap.delayedCall(0.045, () => { flash.visible = false })
+            }
+        }
+
+        this.game.physicalVehicle.events.on('gunFire', this.guns.fireCallback)
     }
 
     setScreenPosition()

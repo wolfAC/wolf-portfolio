@@ -1,10 +1,12 @@
+import { REPO_URL } from './constants.js'
+
 export default [
-    { name: 'X', url: 'https://x.com/bruno_simon', align: 'right' },
-    { name: 'Bluesky', url: 'https://bsky.app/profile/bruno-simon.bsky.social', align: 'right' },
-    { name: 'Youtube', url: 'https://www.youtube.com/@BrunoSimon', align: 'right' },
-    { name: 'Mail', url: 'mailto:simon.bruno.77@gmail.com', align: 'right' },
-    { name: 'Twitch', url: 'https://www.twitch.tv/bruno_simon_dev', align: 'right' },
-    { name: 'GitHub', url: 'https://github.com/brunosimon', align: 'right' },
-    { name: 'LinkedIn', url: 'https://www.linkedin.com/in/simonbruno77/', align: 'left' },
+    { name: 'X', url: '#', align: 'right' }, // TODO: replace with your X/Twitter profile
+    { name: 'Bluesky', url: '#', align: 'right' }, // TODO: replace with your Bluesky profile
+    { name: 'Youtube', url: '#', align: 'right' }, // TODO: replace with your Youtube channel
+    { name: 'Mail', url: '#', align: 'right' }, // TODO: replace with 'mailto:you@example.com'
+    { name: 'Twitch', url: '#', align: 'right' }, // TODO: replace with your Twitch channel
+    { name: 'GitHub', url: REPO_URL, align: 'right' },
+    { name: 'LinkedIn', url: '#', align: 'left' }, // TODO: replace with your LinkedIn profile
     { name: 'Discord', modal: 'discord', align: 'left' },
 ]

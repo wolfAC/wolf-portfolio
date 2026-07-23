@@ -213,6 +213,32 @@ export class Track
     {
         const data = this.dataTexture.source.data.data
 
+        // First update: the ring buffer starts zeroed (world origin), so the
+        // trail mesh would otherwise stretch from the vehicle's real position
+        // all the way back to (0, 0, 0) until enough driving has shifted that
+        // stale data out -- visible as a long, erratically-oriented streak
+        // wherever the origin happens to sit relative to the vehicle/camera.
+        // Seeding every sample with the current position up front avoids that.
+        if(!this.initialized)
+        {
+            this.initialized = true
+
+            for(let i = 0; i < this.subdivisions; i++)
+            {
+                const i4 = i * 4
+                data[i4    ] = _position.x
+                data[i4 + 1] = _position.y
+                data[i4 + 2] = _position.z
+                data[i4 + 3] = _touching ? 1 : 0
+            }
+
+            this.lastTime = this.game.ticker.elapsed
+            this.lastPosition.copy(_position)
+
+            this.dataTexture.needsUpdate = true
+            return
+        }
+
         // Throttle by time
         const lastTimeDelta = this.game.ticker.elapsed - this.lastTime
         if(lastTimeDelta > this.timeThrottle)

@@ -1,63 +1,83 @@
 import * as THREE from 'three/webgpu'
-import { color, vec3 } from 'three/tsl'
+import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js'
 import { Game } from '../Game.js'
-import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
-import { buildBoxUnionGeometry } from '../Geometries/BoxUnionGeometry.js'
 
-// Phase F: an original "night-runner" vehicle, procedural (no glTF -- no 3D
-// authoring tool available here, same reasoning as Roads.js/Buildings.js).
-// Builds a THREE.Group with the exact named-child convention
-// VisualVehicle.js's setParts()/setWheels() already looks for via regex match
-// (bodyPainted, chassis, wheelContainer > wheelCylinder/wheelSuspension/
-// wheelPainted, stopLights, backLights, blinkerLeft/Right, energy, cell1-3) --
-// VisualVehicle.js itself is completely unchanged, it just gets a procedurally
-// built model instead of a loaded glTF scene.
+// This vehicle model is adapted from a user-provided glTF asset, loaded once
+// as game.resources.vehicleModel (see Game.js), rather than built
+// procedurally. Every mesh/material/UV/skin from the source file is left
+// untouched -- only Object3D container nodes are added or renamed so the
+// hierarchy matches what VisualVehicle.js's setParts()/setWheels() already
+// look for (bodyPainted, chassis, wheelContainer > wheelCylinder).
 //
-// Dimensions match the Phase A4 targets exactly (wheelbase 1.8m / track 1.5m /
-// wheel diameter 0.8m come straight from Physics/PhysicsVehicle.js's existing
-// `wheels.settings.offset`/`radius` -- unchanged, no physics retune needed;
-// body length/width/height land inside the 2.6-3.0m / 1.8-2.0m / 1.0-1.2m
-// suggested ranges).
+// The whole source file is one skin -- a single ~209-bone skeleton shared by
+// all 14 meshes -- so there's no clonable per-wheel "wheelContainer" subtree
+// in this asset the way the old procedural model had one (its 4 wheel
+// meshes are combined into shared meshes like Tyre_MIC/Wheel_MIC, skinned
+// across all 4 wheel positions at once). The whole rig therefore moves as a
+// single rigid body driven by physics's chassis transform, same as
+// bodyPainted already does; wheels don't spin/steer/compress independently.
+// wheelContainer/wheelCylinder below are inert placeholder nodes (no
+// geometry) that exist purely so VisualVehicle.js's existing clone-based
+// wheel loop has something non-null to clone x4 -- the real wheel geometry
+// stays embedded in the skinned rig and renders in its authored rest pose.
 //
-// The antenna sub-rig (a whimsical bobble-head detail specific to the
-// original folio's character) is deliberately not rebuilt -- it's fully
-// optional/guarded in VisualVehicle.js, so omitting it doesn't affect vehicle
-// function; see audit/phase-f-implementation-notes.md.
-const WHEEL_RADIUS = 0.4 // must match Physics/PhysicsVehicle.js's wheels.settings.radius
-const WHEEL_HALF_WIDTH = 0.16
+// blinkers/stopLights/backLights/antenna/energy/cell1-3/gunBarrel*/
+// muzzleFlash* have no equivalent parts in the source file; all of them are
+// already optional/guarded in VisualVehicle.js, so they're simply absent
+// here rather than faked with unrelated geometry.
 
-const VARIANTS = {
-    default: {
-        cabinHalfHeight: 0.225,
-        cabinOffsetX: -0.2,
-        underglowColor: '#ff2e8a',
-        energyColor: '#ff2eb4',
-    },
-    oldSchool: {
-        cabinHalfHeight: 0.3,
-        cabinOffsetX: -0.05,
-        underglowColor: '#28e0ff',
-        energyColor: '#128fff',
-    },
-}
+// "Chassis_02" is a bone name inside the source rig that collides with
+// VisualVehicle.js's `^chassis` part-name search (which does a plain
+// prefix-match over every node in the whole hierarchy and would otherwise
+// overwrite this.parts.chassis with this mid-skeleton bone instead of the
+// intended root, since it's visited later in traversal order). Renaming it
+// is a pure Object3D.name change -- no geometry/material/skin data touched.
+const CHASSIS_BONE_COLLISION_NAME = 'Chassis_02'
+const CHASSIS_BONE_RENAMED = 'rig_Chassis_02'
 
-function markMaterial(material, name)
+// Node name of the main body-shell mesh in the source file (glTF node
+// "Object_218", mesh "Batmobile_DLC_Tumbler_Body_MIC") -- renamed so
+// VisualVehicle.js's setPaints() can find and recolor it, same as any other
+// vehicle model's bodyPainted mesh.
+const BODY_MESH_NODE_NAME = 'Object_218'
+
+// The source file is already authored in real-world meters (its body shell
+// measures roughly 5.6m long / 3.9m wide / 1.9m tall -- the size of the
+// actual vehicle it's modeled after), while this game's
+// Physics/PhysicsVehicle.js wheels.settings describes a much smaller arcade
+// wheelbase (2 * offset.x = 1.8m). This constant uniformly rescales the
+// whole visual model to roughly match that physics wheelbase, measured
+// empirically off the skinned wheel-rim mesh's actual world-space extent
+// (front-to-rear span ~5.39m -- bone-node translations in this rig are
+// mostly parent-relative, not directly comparable across branches, so they
+// can't be used for this measurement directly):
+//   scale = physicsWheelbase (1.8) / measuredWheelSpan (5.39)
+// The source vehicle's front track is much narrower than its rear track (a
+// design trait of the real vehicle it's modeled after, not a data error),
+// which the physics rig's symmetric 4-wheel box can't reproduce -- ground
+// contact/tire tracks will sit slightly outside the visual wheels as a
+// result.
+const MODEL_SCALE = 0.33387597146601317
+
+function markMaterialsPreserved(root)
 {
-    material.name = name
-    material.userData.prevent = true // skip Materials.updateObject()'s name-based conversion, see implementation notes
-    return material
-}
+    root.traverse((child) =>
+    {
+        if(!child.isMesh)
+            return
 
-function buildBodyGeometry(variant)
-{
-    return buildBoxUnionGeometry([
-        // Lower shell: length 2.8, width 1.9, height 0.55 -> spans y -0.4..0.15
-        { centerX: 0, centerY: -0.125, centerZ: 0, halfLength: 1.4, halfHeight: 0.275, halfWidth: 0.95 },
-        // Cabin/greenhouse, set back toward the rear for a long-hood silhouette
-        { centerX: variant.cabinOffsetX, centerY: 0.15 + variant.cabinHalfHeight, centerZ: 0, halfLength: 0.75, halfHeight: variant.cabinHalfHeight, halfWidth: 0.75 },
-        // Low rear spoiler deck
-        { centerX: -1.3, centerY: 0.35, centerZ: 0, halfLength: 0.12, halfHeight: 0.06, halfWidth: 0.85 },
-    ])
+        // Skinned meshes are culled against their *unskinned* local-space
+        // bounding volume in three.js, which doesn't reflect where skinning
+        // actually places the vertices -- without this, the renderer can
+        // wrongly decide the mesh is outside the frustum and skip it, even
+        // though it's clearly on screen.
+        child.frustumCulled = false
+
+        const materials = Array.isArray(child.material) ? child.material : [ child.material ]
+
+        for(const material of materials)
+            material.userData.prevent = true // skip Materials.updateObject()'s name-based conversion, see implementation notes
+    })
 }
 
 function buildWheelContainer()
@@ -65,116 +85,41 @@ function buildWheelContainer()
     const container = new THREE.Group()
     container.name = 'wheelContainer'
 
-    const tireGeometry = new THREE.CylinderGeometry(WHEEL_RADIUS, WHEEL_RADIUS, WHEEL_HALF_WIDTH * 2, 16)
-    tireGeometry.rotateX(Math.PI / 2)
-    const cylinder = new THREE.Mesh(tireGeometry, markMaterial(new MeshDefaultMaterial({ colorNode: color('#151420') }), 'vehicleTire'))
+    const cylinder = new THREE.Object3D()
     cylinder.name = 'wheelCylinder'
     container.add(cylinder)
-
-    const rimGeometry = new THREE.CylinderGeometry(WHEEL_RADIUS * 0.45, WHEEL_RADIUS * 0.45, WHEEL_HALF_WIDTH * 2 + 0.01, 12)
-    rimGeometry.rotateX(Math.PI / 2)
-    const painted = new THREE.Mesh(rimGeometry, markMaterial(new MeshDefaultMaterial({ colorNode: color('#ffffff') }), 'vehicleWheelPainted'))
-    painted.name = 'wheelPainted'
-    container.add(painted)
-
-    // Strut geometry spans local y = 0 (anchored at the wheel hub) to y = 1,
-    // so VisualVehicle.js's `.scale.y = suspensionScale` stretches the top
-    // toward the chassis while the bottom stays pinned at the wheel.
-    const strutGeometry = new THREE.BoxGeometry(0.1, 1, 0.1)
-    strutGeometry.translate(0, 0.5, 0)
-    const suspension = new THREE.Mesh(strutGeometry, markMaterial(new MeshDefaultMaterial({ colorNode: color('#23212f') }), 'vehicleSuspension'))
-    suspension.name = 'wheelSuspension'
-    container.add(suspension)
 
     return container
 }
 
+// variantName is kept only so call sites (World.js, KonamiCode.js) don't
+// need to change -- the source asset has no equivalent per-variant tuning
+// (color/geometry), so it's currently a no-op.
 export function buildVehicleModel(variantName = 'default')
 {
     const game = Game.getInstance()
-    const variant = VARIANTS[variantName] ?? VARIANTS.default
 
-    const model = new THREE.Group()
-    model.name = 'vehicleModel'
-
-    const chassis = new THREE.Group()
+    const chassis = cloneSkinned(game.resources.vehicleModel.scene)
     chassis.name = 'chassis'
-    model.add(chassis)
+    chassis.scale.setScalar(MODEL_SCALE)
 
-    // Body (paint color applied immediately afterward by VisualVehicle's own
-    // setPaints(); this initial material is only ever visible for a single
-    // synchronous construction step)
-    const bodyPainted = new THREE.Mesh(buildBodyGeometry(variant), markMaterial(new MeshDefaultMaterial({ colorNode: color('#23212f') }), 'vehicleBodyPainted'))
-    bodyPainted.name = 'bodyPainted'
-    chassis.add(bodyPainted)
+    const collidingBone = chassis.getObjectByName(CHASSIS_BONE_COLLISION_NAME)
+    if(collidingBone)
+        collidingBone.name = CHASSIS_BONE_RENAMED
 
-    // Underglow strip (always-on decorative accent, Phase A1's vehicle direction)
-    const underglowGeometry = new THREE.BoxGeometry(2.6, 0.04, 0.06)
-    underglowGeometry.translate(0, -0.42, 0)
-    const underglowMaterialLeft = markMaterial(new THREE.MeshBasicNodeMaterial({ color: new THREE.Color(variant.underglowColor).multiplyScalar(3) }), 'vehicleUnderglow')
-    const underglowLeft = new THREE.Mesh(underglowGeometry, underglowMaterialLeft)
-    underglowLeft.position.z = 0.9
-    underglowLeft.name = 'underglowLeft'
-    chassis.add(underglowLeft)
-    const underglowRight = new THREE.Mesh(underglowGeometry, underglowMaterialLeft)
-    underglowRight.position.z = -0.9
-    underglowRight.name = 'underglowRight'
-    chassis.add(underglowRight)
+    const bodyMesh = chassis.getObjectByName(BODY_MESH_NODE_NAME)
+    if(bodyMesh)
+        bodyMesh.name = 'bodyPainted'
 
-    // Stop lights (brake) -- only ever shown/hidden, never recolored, so it
-    // needs its own visibly-red material up front
-    const stopLightsGeometry = new THREE.BoxGeometry(0.05, 0.12, 1.7)
-    stopLightsGeometry.translate(-1.4, 0.05, 0)
-    const stopLights = new THREE.Mesh(stopLightsGeometry, markMaterial(new THREE.MeshBasicNodeMaterial({ colorNode: vec3(2.4, 0.08, 0.12) }), 'vehicleStopLights'))
-    stopLights.name = 'stopLights'
-    stopLights.visible = false
-    chassis.add(stopLights)
-
-    // Back lights (reverse) -- material gets swapped every frame by
-    // VisualVehicle.js's update(), initial value just needs to be valid
-    const backLightsGeometry = new THREE.BoxGeometry(0.05, 0.1, 1.2)
-    backLightsGeometry.translate(-1.4, -0.15, 0)
-    const backLights = new THREE.Mesh(backLightsGeometry, markMaterial(new THREE.MeshBasicNodeMaterial({ colorNode: vec3(2.2) }), 'vehicleBackLights'))
-    backLights.name = 'backLights'
-    backLights.visible = false
-    chassis.add(backLights)
-
-    // Blinkers (turn signals)
-    const blinkerGeometry = new THREE.BoxGeometry(0.14, 0.1, 0.14)
-    const blinkerMaterial = markMaterial(game.materials.getFromName('emissiveOrangeRadialGradient'), 'emissiveOrangeRadialGradient')
-    const blinkerLeft = new THREE.Mesh(blinkerGeometry, blinkerMaterial)
-    blinkerLeft.position.set(1.3, 0, 0.85)
-    blinkerLeft.name = 'blinkerLeft'
-    blinkerLeft.visible = false
-    chassis.add(blinkerLeft)
-    const blinkerRight = new THREE.Mesh(blinkerGeometry, blinkerMaterial)
-    blinkerRight.position.set(1.3, 0, -0.85)
-    blinkerRight.name = 'blinkerRight'
-    blinkerRight.visible = false
-    chassis.add(blinkerRight)
-
-    // Boost energy panel + charge cells
-    const energyGeometry = new THREE.BoxGeometry(0.08, 0.3, 0.5)
-    energyGeometry.translate(-1.36, 0.3, 0)
-    const energy = new THREE.Mesh(energyGeometry, markMaterial(new MeshDefaultMaterial({ colorNode: color(variant.energyColor) }), 'vehicleEnergy'))
-    energy.name = 'energy'
-    chassis.add(energy)
-
-    const cellGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1)
-    const cellMaterial = markMaterial(game.materials.getFromName('emissivePurpleRadialGradient'), 'emissivePurpleRadialGradient')
-    const cellOffsets = [ -0.15, 0, 0.15 ]
-    for(let i = 0; i < 3; i++)
-    {
-        const cell = new THREE.Mesh(cellGeometry, cellMaterial)
-        cell.position.set(-1.36, 0.2, cellOffsets[i])
-        cell.name = `cell${i + 1}`
-        chassis.add(cell)
-    }
+    markMaterialsPreserved(chassis)
 
     // Wheel container template (never rendered directly -- setWheels() clones
     // it 4x and attaches the clones to chassis; kept as a sibling of chassis,
     // inside `model`, which is discarded after VisualVehicle.js extracts
     // chassis, so this template itself never appears in the live scene)
+    const model = new THREE.Group()
+    model.name = 'vehicleModel'
+    model.add(chassis)
     model.add(buildWheelContainer())
 
     return model

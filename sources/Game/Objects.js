@@ -317,12 +317,23 @@ export class Objects
         }
         this.list.forEach((_object) =>
         {
-            const position = _object.physical ? _object.physical.body.translation() : null
+            // Fixed bodies are never moved after creation (nothing in the
+            // codebase calls setTranslation/setRotation on a fixed body -- only
+            // on dynamic/kinematic ones), their visual transform is already
+            // synced once in add(), and Rapier never simulates a fixed body
+            // regardless of its sleep state, so none of the per-tick sync/
+            // floor-reset/distance-cull work below has any effect for them.
+            // Skipping it avoids a Rapier FFI call per fixed body per tick,
+            // which scales with the (now much larger, post Cyber City) count
+            // of static buildings/roads/scenery.
+            if(!_object.physical || _object.physical.type === 'fixed')
+                return
+
+            const position = _object.physical.body.translation()
 
             // Apply physical to visual
             if(
                 _object.visual &&
-                _object.physical &&
                 (
                     _object.needsUpdate ||
                     (
@@ -337,24 +348,20 @@ export class Objects
                 _object.visual.object3D.quaternion.copy(_object.physical.body.rotation())
             }
 
-
-            if(_object.physical)
+            // Felt in the floor => reset
+            if(position.y < this.game.water.depthElevation)
             {
-                // Felt in the floor => reset
-                if(position.y < this.game.water.depthElevation)
-                {
-                    this.resetObject(_object)
-                }
+                this.resetObject(_object)
+            }
 
-                // Far from view => Reset
-                if(objectsNeedDistanceTest)
+            // Far from view => Reset
+            if(objectsNeedDistanceTest)
+            {
+                const distanceToView = Math.hypot(this.roundedViewPosition.x - position.x, this.roundedViewPosition.z - position.z)
+
+                if(_object.physical.body.isEnabled() && !_object.physical.body.isSleeping() && distanceToView > this.game.view.optimalArea.radius)
                 {
-                    const distanceToView = Math.hypot(this.roundedViewPosition.x - position.x, this.roundedViewPosition.z - position.z)
-                
-                    if(_object.physical.body.isEnabled() && !_object.physical.body.isSleeping() && distanceToView > this.game.view.optimalArea.radius)
-                    {
-                        _object.physical.body.sleep()
-                    }
+                    _object.physical.body.sleep()
                 }
             }
         })

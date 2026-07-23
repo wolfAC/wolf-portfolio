@@ -1,0 +1,28 @@
+.fire-button
+    display none
+    position absolute
+    right 24px
+    bottom 24px
+    z-index 2
+    width 88px
+    height 88px
+    align-items center
+    justify-content center
+    border-radius 50%
+    background rgba(255, 45, 45, 0.35)
+    border 2px solid rgba(255, 255, 255, 0.6)
+    color #ffffff
+    font-family "Amatic SC", sans-serif
+    font-weight 700
+    font-size 28px
+    pointer-events auto
+    touch-action none
+    -webkit-user-select none
+    user-select none
+
+    html.input-filter-wandering &,
+    html.input-filter-racing &
+        display flex
+
+    &:active
+        background rgba(255, 45, 45, 0.6)

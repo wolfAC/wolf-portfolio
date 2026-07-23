@@ -18,7 +18,9 @@ export class Player
         this.accelerating = 0
         this.steering = 0
         this.boosting = 0
+        this.wasBoosting = 0
         this.braking = 0
+        this.firing = 0
         this.suspensions = ['low', 'low', 'low', 'low']
 
         const respawn = this.game.respawns.getDefault()
@@ -167,7 +169,10 @@ export class Player
                     
                     item.volume += delta * this.game.ticker.deltaScaled * easing
 
-                    const rate = remapClamp(accelerating * boosting, 0, 1, 0.6, 1.1)
+                    // Reworked for a deeper, heavier idle/rev (armored-interceptor
+                    // tone rather than the original muscle-car pitch) -- same
+                    // asset, just a lower rate curve, no new audio file needed
+                    const rate = remapClamp(accelerating * boosting, 0, 1, 0.45, 0.85)
                     item.rate += (rate - item.rate) * this.game.ticker.deltaScaled * 5
                 }
             })
@@ -213,6 +218,72 @@ export class Player
                 item.rate += (rate - item.rate) * this.game.ticker.deltaScaled * 5
             }
         })
+
+        // Boost ignition (one-shot kick when boost activates -- reworked from
+        // the swoosh asset already used elsewhere, no new sound file needed)
+        this.sounds.boostIgnition = this.game.audio.register({
+            path: 'sounds/swoosh/Swoosh 02.mp3',
+            autoplay: false,
+            loop: false,
+            volume: 0.5,
+            antiSpam: 0.3,
+            onPlay: (item) =>
+            {
+                item.volume = 0.45 + Math.random() * 0.1
+                item.rate = 0.8 + Math.random() * 0.15
+            }
+        })
+
+        // Guns: fire report + hit-confirm impact, both reworked from existing
+        // hit/explosion assets rather than new licensed sound files
+        this.sounds.gunFire = this.game.audio.register({
+            group: 'gunFire',
+            path: 'sounds/hits/metal/EQUIPTact_Fire Gear_SDFIRE0411.mp3',
+            autoplay: false,
+            loop: false,
+            volume: 0.5,
+            antiSpam: 0.05,
+            onPlay: (item) =>
+            {
+                item.volume = 0.4 + Math.random() * 0.1
+                item.rate = 1.3 + Math.random() * 0.25
+            }
+        })
+
+        {
+            const paths = [
+                'sounds/explosions/SmallImpactMediumE PE281202.mp3',
+                'sounds/explosions/SmallImpactMediumE PE281203.mp3',
+            ]
+
+            for(const path of paths)
+            {
+                this.game.audio.register({
+                    group: 'gunImpact',
+                    path,
+                    autoplay: false,
+                    loop: false,
+                    volume: 0.6,
+                    antiSpam: 0.05,
+                    positions: new THREE.Vector3(),
+                    distanceFade: 30,
+                    onPlay: (item, position) =>
+                    {
+                        item.positions[0].copy(position)
+                        item.volume = 0.5 + Math.random() * 0.25
+                        item.rate = 0.75 + Math.random() * 0.25
+                    }
+                })
+            }
+        }
+
+        this.game.physicalVehicle.events.on('gunFire', ({ hitPoint }) =>
+        {
+            this.sounds.gunFire.play()
+
+            if(hitPoint)
+                this.game.audio.groups.get('gunImpact').playRandomNext(hitPoint)
+        })
     }
 
     setInputs()
@@ -223,12 +294,21 @@ export class Player
             { name: 'backward',              categories: [ 'wandering', 'racing', 'cinematic' ], keys: [ 'Keyboard.ArrowDown', 'Keyboard.KeyS', 'Gamepad.down', 'Gamepad.l2' ] },
             { name: 'left',                  categories: [ 'wandering', 'racing', 'cinematic' ], keys: [ 'Keyboard.ArrowLeft', 'Keyboard.KeyA', 'Gamepad.left' ] },
             { name: 'boost',                 categories: [ 'wandering', 'racing'              ], keys: [ 'Keyboard.ShiftLeft', 'Keyboard.ShiftRight', 'Gamepad.circle' ] },
+            // Gamepad.r1 reassigned from suspensionsRight below (every other
+            // gamepad button was already claimed by another action in these
+            // categories -- r1/RB doubling as a fire trigger is also the more
+            // idiomatic convention for this genre). suspensionsRight keeps its
+            // keyboard binding; only the gamepad-specific per-corner lean is
+            // dropped in favor of guns. Touch.fire comes from Inputs.js's
+            // setFireButton(), a dedicated always-on HUD button (no existing
+            // touch control had hold-to-fire semantics to reuse).
+            { name: 'fire',                  categories: [ 'wandering', 'racing'              ], keys: [ 'Keyboard.KeyG', 'Gamepad.r1', 'Touch.fire' ] },
             { name: 'brake',                 categories: [ 'wandering', 'racing'              ], keys: [ 'Keyboard.KeyB', 'Keyboard.ControlLeft', 'Gamepad.square' ] },
             { name: 'respawn',               categories: [ 'wandering',                       ], keys: [ 'Keyboard.KeyR', 'Gamepad.select' ] },
             { name: 'suspensions',           categories: [ 'wandering', 'racing'              ], keys: [ 'Keyboard.Numpad5', 'Keyboard.Space', 'Gamepad.triangle' ] },
             { name: 'suspensionsFront',      categories: [ 'wandering', 'racing'              ], keys: [ 'Keyboard.Numpad8' ] },
             { name: 'suspensionsBack',       categories: [ 'wandering', 'racing'              ], keys: [ 'Keyboard.Numpad2' ] },
-            { name: 'suspensionsRight',      categories: [ 'wandering', 'racing'              ], keys: [ 'Keyboard.Numpad6', 'Gamepad.r1' ] },
+            { name: 'suspensionsRight',      categories: [ 'wandering', 'racing'              ], keys: [ 'Keyboard.Numpad6' ] },
             { name: 'suspensionsLeft',       categories: [ 'wandering', 'racing'              ], keys: [ 'Keyboard.Numpad4', 'Gamepad.l1' ] },
             { name: 'suspensionsFrontLeft',  categories: [ 'wandering', 'racing'              ], keys: [ 'Keyboard.Numpad7', 'Keyboard.Digit2' ] },
             { name: 'suspensionsFrontRight', categories: [ 'wandering', 'racing'              ], keys: [ 'Keyboard.Numpad9', 'Keyboard.Digit3' ] },
@@ -523,8 +603,10 @@ export class Player
     {
         this.accelerating = 0
         this.steering = 0
+        this.wasBoosting = this.boosting
         this.boosting = 0
         this.braking = 0
+        this.firing = 0
 
         if(this.state !== Player.STATE_DEFAULT)
             return
@@ -543,6 +625,16 @@ export class Player
          */
         if(this.game.inputs.actions.get('boost').active)
             this.boosting = 1
+
+        // Rising edge => boost just kicked in
+        if(this.boosting && !this.wasBoosting)
+            this.sounds.boostIgnition.play()
+
+        /**
+         * Firing
+         */
+        if(this.game.inputs.actions.get('fire').active)
+            this.firing = 1
 
         /**
          * Braking

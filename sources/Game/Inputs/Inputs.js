@@ -46,6 +46,7 @@ export class Inputs
         this.setWheel()
         this.setInteractiveButtons()
         this.setNipple()
+        this.setFireButton()
 
         this.addActions(actions)
         
@@ -164,6 +165,38 @@ export class Inputs
                 
             this.nipple.updateFromPointer(this.pointer, action)
         })
+    }
+
+    // A dedicated always-on HUD button for firing on touch -- unlike
+    // boost/honk/brake (keyboard/gamepad only today), the guns feature needs
+    // hold-to-fire semantics that InteractiveButtons' click-only contextual
+    // prompts don't provide, so this wires its own start/end pair straight
+    // into the same key-namespaced action system Keyboard/Gamepad use.
+    setFireButton()
+    {
+        this.fireButton = document.querySelector('.js-fire-button')
+
+        if(!this.fireButton)
+            return
+
+        const start = (_event) =>
+        {
+            _event.preventDefault()
+            this.start('Touch.fire')
+        }
+
+        const end = (_event) =>
+        {
+            _event.preventDefault()
+            this.end('Touch.fire')
+        }
+
+        this.fireButton.addEventListener('touchstart', start)
+        this.fireButton.addEventListener('touchend', end)
+        this.fireButton.addEventListener('touchcancel', end)
+        this.fireButton.addEventListener('mousedown', start)
+        this.fireButton.addEventListener('mouseup', end)
+        this.fireButton.addEventListener('mouseleave', end)
     }
 
     addActions(actions)

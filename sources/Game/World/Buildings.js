@@ -214,8 +214,11 @@ export class Buildings
             // Per-window lit/unlit randomness: sample the shared hash noise at a
             // UV scaled down to roughly one texel per window cell, so (unlike a
             // per-pixel sample) each window reads as a single random value
-            // rather than continuous noise.
-            const hashUv = vec2(uv().x.div(this.cellU), uv().y.div(this.cellV))
+            // rather than continuous noise. floor() is what pins the sample to
+            // one texel for the whole cell -- without it this is a continuously
+            // varying coordinate into a NearestFilter texture, which samples a
+            // different noise texel per-pixel (visible as static/aliasing).
+            const hashUv = vec2(uv().x.div(this.cellU).floor(), uv().y.div(this.cellV).floor())
             const hash = texture(this.game.noises.hash, hashUv).r
             const lit = hash.smoothstep(this.windowLitRatio, this.windowLitRatio.add(0.02)).oneMinus()
 

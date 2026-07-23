@@ -1,5 +1,4 @@
 import * as THREE from 'three/webgpu'
-import { InteractivePoints } from '../../InteractivePoints.js'
 import { Area } from './Area.js'
 import { Fn, texture, uv, vec2, vec3, vec4 } from 'three/tsl'
 import gsap from 'gsap'
@@ -10,35 +9,8 @@ export class TimeMachineArea extends Area
     {
         super(model)
 
-        this.setInteractivePoint()
         this.setTV()
         this.setAchievement()
-    }
-
-    setInteractivePoint()
-    {
-        this.interactivePoint = this.game.interactivePoints.create(
-            this.references.items.get('interactivePoint')[0].position,
-            'Time Machine',
-            InteractivePoints.ALIGN_RIGHT,
-            InteractivePoints.STATE_CONCEALED,
-            () =>
-            {
-                window.open('https://2019.bruno-simon.com')
-            },
-            () =>
-            {
-                this.game.inputs.interactiveButtons.addItems(['interact'])
-            },
-            () =>
-            {
-                this.game.inputs.interactiveButtons.removeItems(['interact'])
-            },
-            () =>
-            {
-                this.game.inputs.interactiveButtons.removeItems(['interact'])
-            }
-        )
     }
 
     setTV()

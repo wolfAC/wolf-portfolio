@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { cameraPosition, color, float, Fn, mix, PI, positionWorld, texture, uniform, uv, vec3 } from 'three/tsl'
+import { cameraPosition, color, float, Fn, fwidth, max, mix, PI, positionWorld, texture, uniform, uv, vec3 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { CYBER_CITY_LAYOUT } from './CyberCityLayout.js'
 
@@ -237,13 +237,24 @@ export class Roads
             const grazing = viewDirection.dot(vec3(0, 1, 0)).abs().smoothstep(0.7, 0).mul(this.fresnelIntensity)
             baseColor.assign(mix(baseColor, this.fresnelColor, grazing))
 
-            // Lane marking: a dashed centerline tinted with the cyan neon accent
+            // Lane marking: a dashed centerline tinted with the cyan neon accent.
+            // Edge widths are widened by fwidth() (screen-space derivative) on
+            // top of the authored softness, so each transition always spans
+            // about a pixel on screen. Without this, the line/dash edges are a
+            // fixed width in world/UV space -- at distance or a grazing angle
+            // that width collapses below a pixel, and the dash mask strobes
+            // on/off between frames as the camera moves (the "flickering
+            // stripes" artifact). fwidth is taken on the pre-mod, continuous
+            // coordinate (uv().x), not on dashPhase itself, since the mod
+            // wrap is a value discontinuity that would spike the derivative.
             const distanceFromCenter = uv().y.sub(0.5).abs()
-            const lineMask = distanceFromCenter.smoothstep(this.laneLineWidth.mul(0.7), this.laneLineWidth).oneMinus()
+            const lineEdge = max(this.laneLineWidth.mul(0.3), fwidth(distanceFromCenter))
+            const lineMask = distanceFromCenter.smoothstep(this.laneLineWidth.sub(lineEdge), this.laneLineWidth.add(lineEdge)).oneMinus()
 
             const dashCycle = this.laneDashLength.add(this.laneGapLength)
             const dashPhase = uv().x.mod(dashCycle)
-            const dashMask = dashPhase.smoothstep(this.laneDashLength.mul(0.9), this.laneDashLength).oneMinus()
+            const dashEdge = max(this.laneDashLength.mul(0.1), fwidth(uv().x))
+            const dashMask = dashPhase.smoothstep(this.laneDashLength.sub(dashEdge), this.laneDashLength.add(dashEdge)).oneMinus()
 
             const laneMask = lineMask.mul(dashMask).mul(this.laneLineIntensity)
             baseColor.assign(mix(baseColor, this.neonColorB, laneMask))

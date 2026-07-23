@@ -73,6 +73,7 @@ export class PhysicsVehicle
         this.setStuck()
         // this.setBackWheel()
         this.setFlip()
+        this.setGuns()
 
         this.game.ticker.events.on('tick', () =>
         {
@@ -443,6 +444,72 @@ export class PhysicsVehicle
         }
     }
 
+    setGuns()
+    {
+        this.guns = {}
+        this.guns.fireRate = 9 // shots per second (alternating barrels)
+        this.guns.range = 45
+        this.guns.impulse = 7 // target knockback velocity given to whatever a shot hits, scaled by its mass -- same convention as flip.jump()'s impulses
+        this.guns.recoil = 0.12 // knockback velocity applied to the chassis itself
+        // Local-space nose position of the barrel tips -- must stay in sync with
+        // the gunBarrelLeft/Right mesh positions built in World/VehicleModel.js
+        this.guns.muzzleOffset = { x: 1.7, y: -0.14, z: 0.5 }
+        this.guns.lastFireTime = -Infinity
+        this.guns.barrelIndex = 0
+
+        this.guns.fire = () =>
+        {
+            if(this.game.ticker.elapsed - this.guns.lastFireTime < 1 / this.guns.fireRate)
+                return
+
+            this.guns.lastFireTime = this.game.ticker.elapsed
+            this.guns.barrelIndex = 1 - this.guns.barrelIndex
+
+            const lateralOffset = this.guns.barrelIndex === 0 ? this.guns.muzzleOffset.z : - this.guns.muzzleOffset.z
+
+            const origin = new THREE.Vector3(this.guns.muzzleOffset.x, this.guns.muzzleOffset.y, lateralOffset)
+            origin.applyQuaternion(this.quaternion)
+            origin.add(this.position)
+
+            const direction = this.forward.clone()
+
+            const ray = new this.game.RAPIER.Ray(origin, direction)
+            const hit = this.game.physics.world.castRay(ray, this.guns.range, true, undefined, undefined, undefined, this.chassis.physical.body)
+
+            let hitPoint = null
+
+            if(hit)
+            {
+                hitPoint = new THREE.Vector3().copy(ray.pointAt(hit.timeOfImpact))
+
+                const hitBody = hit.collider.parent()
+                const hitObject = hitBody?.userData?.object
+
+                // Only dynamic props get knocked around -- fixed/kinematic bodies
+                // (buildings, roads) would just silently no-op the impulse anyway
+                if(hitObject?.physical?.type === 'dynamic')
+                {
+                    const impulse = direction.clone().multiplyScalar(this.guns.impulse * hitBody.mass())
+                    hitBody.applyImpulseAtPoint(impulse, hitPoint, true) // wake it up in case distance-culling put it to sleep
+                }
+            }
+
+            const recoilImpulse = direction.clone().multiplyScalar(- this.guns.recoil * this.chassis.mass)
+            this.chassis.physical.body.applyImpulse(recoilImpulse)
+
+            this.events.trigger('gunFire', [ { origin, direction, hitPoint, barrelIndex: this.guns.barrelIndex } ])
+        }
+
+        if(this.game.debug.active)
+        {
+            this.debugPanel.addBlade({ view: 'separator' })
+            this.debugPanel.addBinding(this.guns, 'fireRate', { min: 1, max: 20, step: 0.5 })
+            this.debugPanel.addBinding(this.guns, 'range', { min: 5, max: 100, step: 1 })
+            this.debugPanel.addBinding(this.guns, 'impulse', { min: 0, max: 30, step: 0.1 })
+            this.debugPanel.addBinding(this.guns, 'recoil', { min: 0, max: 1, step: 0.01 })
+        }
+    }
+
     moveTo(position, rotation = 0)
     {
         const quaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rotation)
@@ -506,6 +573,10 @@ export class PhysicsVehicle
                 this.controller.setWheelFrictionSlip(i, onIce ? iceFriction : this.wheels.settings.frictionSlip)
             }
         }
+
+        // Guns
+        if(this.game.player.firing)
+            this.guns.fire()
 
         // Update controller
         const delta = this.game.quality.level === 1 ? 1/60 : Math.min(1/60, this.game.ticker.deltaAverage)

@@ -1,4 +1,5 @@
 import { Game } from './Game.js'
+import { AUTHOR_NAME } from '../data/constants.js'
 
 export class Title
 {
@@ -85,7 +86,7 @@ export class Title
             }
 
             
-            document.title = 'Bruno' + title.join('')
+            document.title = AUTHOR_NAME + title.join('')
         }
     }
 }
