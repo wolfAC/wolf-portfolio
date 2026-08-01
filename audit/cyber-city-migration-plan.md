@@ -112,83 +112,104 @@ There is currently **no building system** in the codebase — this is new work, 
 
 ## Phase H — Lighting (depends on A1; otherwise parallel)
 
-- **H1. [DESIGN]** Decide day-cycle fate: keep `Cycles/DayCycles.js`'s 4-phase day/dusk/night/dawn loop (retint presets for a city), or collapse to a permanent "night" mood with only subtle variation. *Depends on: A1.*
-- **H2. [CODE]** Re-tint `DayCycles.js`'s `presets` object (light/shadow/fog/reveal colors per phase) to the new palette — data-only change, no structural change, can be iterated many times cheaply.
-- **H3. [CODE]** Tune `Game/Ligthing.js`'s directional-light intensity/angle defaults for a night-dominant look (dimmer sun-equivalent, more reliance on emissive props for fill light) — small parameter pass, depends on H1's decision but not on final art.
-- **H4. [DESIGN]** Decide whether to add secondary point/area "practical" lights (streetlights, sign glow) beyond the single directional light — if yes, scope as a follow-up task (`H5`) since it's a new lighting system, not a reskin.
-- **H5. [CODE]** (Conditional on H4) Add point-light or emissive-only (shader-only, no real light) glow for streetlights from Phase E, matching current perf posture — likely emissive-material-only to avoid real-time shadow-casting light count blowing up on `Quality` level 1 (mobile).
+**Status: IMPLEMENTED.** See `phase-h-implementation-notes.md` for the full write-up, including why `Ligthing.js` itself needed no code change (H3) and why H4 was decided against adding real point lights.
+
+- **H1. [DESIGN] ✅** Decide day-cycle fate: keep `Cycles/DayCycles.js`'s 4-phase day/dusk/night/dawn loop (retint presets for a city), or collapse to a permanent "night" mood with only subtle variation. *Depends on: A1.* → kept the 4-phase loop per A1's explicit decision, renamed to overcastDusk/neonDusk/deepNight/electricDawn
+- **H2. [CODE] ✅** Re-tint `DayCycles.js`'s `presets` object (light/shadow/fog/reveal colors per phase) to the new palette — data-only change, no structural change, can be iterated many times cheaply. → all 4 presets retinted, `lightIntensity` brought into A1's binding ranges (`deepNight` was 3.8, now 0.6)
+- **H3. [CODE] ✅** Tune `Game/Ligthing.js`'s directional-light intensity/angle defaults for a night-dominant look (dimmer sun-equivalent, more reliance on emissive props for fill light) — small parameter pass, depends on H1's decision but not on final art. → verified no change needed: the fixed `DirectionalLight(0xffffff, 5)` only drives shadow-map position/frustum and is never read as a color/brightness value; the actual mood lever is `dayCycles.properties.lightColor/lightIntensity` multiplied directly into `MeshDefaultMaterial`'s output color, which H2 already retuned. `phi`/`theta`/amplitudes are shadow-direction tuning, unrelated to color mood; left untouched.
+- **H4. [DESIGN] ✅** Decide whether to add secondary point/area "practical" lights (streetlights, sign glow) beyond the single directional light — if yes, scope as a follow-up task (`H5`) since it's a new lighting system, not a reskin. → decided against: Phase E's streetlights/signs already glow via emissive materials + bloom (no real light consumed), consistent with this codebase's shading model and perf posture; adding real dynamic lights would be a new, riskier system for no visible gain.
+- **H5. [CODE]** Skipped — H4's decision was "no," and the plan's own wording marks H5 conditional on that decision.
 
 ---
 
 ## Phase I — Weather & atmosphere (parallel with everything)
 
-- **I1. [DESIGN]** Decide which existing weather systems fit a cyber city (rain fits well; snow/lightning are optional; wind-blown leaves should likely be replaced with wind-blown litter/steam).
-- **I2. [CODE]** Re-tint `Game/Fog.js`'s radial background/fog colors to the new palette — data-only, depends on A1 not on other phases.
-- **I3. [ASSET]** If keeping rain (`World/RainLines.js`), no asset change needed; if adding "steam vents" or "smog", author a new small particle/plane effect following the same pattern as `RainLines.js`/`Snow.js`.
-- **I4. [CODE]** Wire any new atmosphere effect from I3 into `Game/Weather.js`'s orchestration, following the existing on/off + intensity pattern used for rain/snow.
+**Status: IMPLEMENTED.** See `phase-i-implementation-notes.md` for the full write-up, including the downstream snow hooks (a Christmas easter egg, a rain-volume duck, a rain-streak deformation) that had to be unwound together, not just the visual `Snow.js` class.
+
+- **I1. [DESIGN] ✅** Decide which existing weather systems fit a cyber city (rain fits well; snow/lightning are optional; wind-blown leaves should likely be replaced with wind-blown litter/steam). → kept rain and lightning (both generic, no nature-coupling, and lightning reinforces the "electric" mood); cut snow entirely (competes with the brief's single "rain-slicked" identity); replaced wind-blown leaves with wind-blown litter (full mechanic reuse, content-only reskin)
+- **I2. [CODE] ✅** Re-tint `Game/Fog.js`'s radial background/fog colors to the new palette — data-only, depends on A1 not on other phases. → verified already satisfied by Phase H: `Fog.js` reads its colors live from `dayCycles.properties.fogColorA/fogColorB`, which Phase H already retinted; no separate change needed here
+- **I3. [ASSET] ✅** If keeping rain (`World/RainLines.js`), no asset change needed; if adding "steam vents" or "smog", author a new small particle/plane effect following the same pattern as `RainLines.js`/`Snow.js`. → rain kept as-is (no asset change); decided against adding a separate steam/smog system for now — the litter reskin is this phase's atmosphere deliverable, keeping scope tight (see notes)
+- **I4. [CODE] ✅** Wire any new atmosphere effect from I3 into `Game/Weather.js`'s orchestration, following the existing on/off + intensity pattern used for rain/snow. → no new effect to wire in per I3's decision; instead unwound the `snow` weather property and every place it fed (`RainLines.js`, `Audio.js`) now that nothing produces it visually
 
 ---
 
 ## Phase J — Water → wet streets (optional; parallel)
 
-- **J1. [DESIGN]** Decide whether the open "sea" (`Game/Water.js`/`World/WaterSurface.js`) is kept as a city-edge waterfront (harbor district) or removed entirely in favor of the new wet-road reflections from G2.
-- **J2. [ASSET]** (If kept) Re-texture/re-tint the water shoreline blend to match the new palette; no geometry change required.
+**Status: IMPLEMENTED.** See `phase-j-implementation-notes.md` for the full write-up, including why the water plane was already invisible before this phase and a latent bug this investigation uncovered and fixed in `Litter.js`.
+
+- **J1. [DESIGN] ✅** Decide whether the open "sea" (`Game/Water.js`/`World/WaterSurface.js`) is kept as a city-edge waterfront (harbor district) or removed entirely in favor of the new wet-road reflections from G2. → removed `WaterSurface.js` (the 467-line reflective plane + its ice collider) entirely: Phase B already eliminated the terrain's low "water sink" areas in favor of curb rises, so the water plane sat permanently hidden beneath solid ground with no way to become visible, and none of the finalized A2/A3 districts are a waterfront. `Water.js` (the small elevation-constant singleton) was kept — several unrelated systems (physics submersion damping, out-of-bounds resets, a shadow-near-water material hack) harmlessly reuse its two constants regardless of whether a visible ocean exists.
+- **J2. [ASSET]** Skipped — not applicable, per J1's "removed entirely" decision.
 
 ---
 
 ## Phase K — Post-processing (fully independent of art/content phases)
 
-- **K1. [CODE]** Tune `Rendering.js`'s bloom pass (`threshold`/`strength`/`smoothWidth`) for a neon-heavy scene (city lights should bloom more aggressively than the original's occasional emissive accents).
-- **K2. [CODE]** Add a new optional post pass (e.g. subtle chromatic aberration or scanline/vignette) alongside the existing `cheapDOF` in `Passes/`, gated by `Quality.level` the same way DOF currently is.
-- **K3. [CODE]** Re-evaluate `cheapDOF.js`'s blur `start`/`end` defaults against the new denser building geometry (tighter depth range in a street canyon vs. an open field).
+**Status: IMPLEMENTED.** See `phase-k-implementation-notes.md` for the full write-up, including why the old bloom threshold meant building windows likely never bloomed at all.
+
+- **K1. [CODE] ✅** Tune `Rendering.js`'s bloom pass (`threshold`/`strength`/`smoothWidth`) for a neon-heavy scene (city lights should bloom more aggressively than the original's occasional emissive accents). → `threshold` 1 → 0.4 (derived from actual A1 palette luminance, see notes), `strength` 0.25 → 0.75; `smoothWidth` left at 1 (already a soft knee, fits the mood)
+- **K2. [CODE] ✅** Add a new optional post pass (e.g. subtle chromatic aberration or scanline/vignette) alongside the existing `cheapDOF` in `Passes/`, gated by `Quality.level` the same way DOF currently is. → added a screenUV-radius vignette, gated to quality level 0 only (matches DOF's tier); chose vignette specifically over chromatic aberration/scanlines since it can't visually go wrong without a GPU to check
+- **K3. [CODE] ✅** Re-evaluate `cheapDOF.js`'s blur `start`/`end` defaults against the new denser building geometry (tighter depth range in a street canyon vs. an open field). → `end` widened 0.5 → 0.62 (and its debug slider ceiling raised to match) so the now-much-taller restored skyline (Phase D) doesn't get blurred into illegibility
 
 ---
 
 ## Phase L — Districts / portfolio content mapping (parallel; content-only, no 3D dependency to start)
 
-- **L1. [DATA]** For each kept district from A2, write the new original theming copy/description (no 3D work yet) — e.g. "Career" becomes "Corporate Spire district", "Lab" becomes "Underground Fabrication district".
-- **L2. [ASSET]** For each district, once L1's concept is written, model its unique set-dressing independent of other districts (these can run fully in parallel with each other once L1 is done for that district).
-- **L3. [CODE]** Update each `Game/World/Areas/*Area.js` subclass's bespoke logic (if any beyond the base `Area` class — e.g. `BowlingArea.js`, `CookieArea.js` have custom mechanics) to match the new district concept, or remove the subclass if the mechanic is dropped per A2.
-- **L4. [DATA]** Update `sources/data/projects.js`, `career.js`, `social.js`, `lab.js` with the actual portfolio owner's content (currently still populated with Bruno Simon's own projects/career entries) — unrelated to the visual Cyber City theme but should not ship as-is regardless of reskin progress.
+**Status: PARTIALLY IMPLEMENTED.** See `phase-l-implementation-notes.md` for the full write-up — this phase turned out to require reconciling `CyberCityLayout.js` itself (5 of its 12 slots pointed at Area classes deleted after A2/D were written) before L1's copy could mean anything, and L3 was found to be much larger in scope than a "reskin" and was deliberately not attempted.
+
+- **L1. [DATA] ✅** For each kept district from A2, write the new original theming copy/description (no 3D work yet) — e.g. "Career" becomes "Corporate Spire district", "Lab" becomes "Underground Fabrication district". → `phase-l-district-copy.md`, covering the 8 districts that survived the layout trim below
+- **L1 (prerequisite, not originally scoped) ✅** `CyberCityLayout.js` still defined 6 districts + 6 alley nodes, but 5 of those slots (`broadcastPlaza`/social, `undercroftYard`/lab, `skylineObservatory`/achievements, `devCircuit`/circuit, `archiveSubstation`/behindTheScene) pointed at Area classes deleted by commit `443974e` after this plan and A2 were written — leaving fully-built roads (and, for the 4 districts, buildings+props) with nothing at the other end. Per direction from the project owner, trimmed the layout to the 8 surviving slots rather than leaving dead ends, relocating the two orphaned hero landmarks instead of deleting them. See notes for the crash this surfaced and how it was fixed.
+- **L2. [ASSET]** Not attempted — needs a 3D authoring tool not available in this environment, same constraint as every other `[ASSET]` task throughout this plan.
+- **L3. [CODE]** Not attempted — found to be much bigger than "update bespoke logic to match the new concept": `BowlingArea.js`, `AltarArea.js`, `CookieArea.js`, `ToiletArea.js`, `TimeMachineArea.js` still run their **original, pre-reskin mechanics/content** wholesale (real bowling, the original altar, the original cookie-consent joke, an actual toilet cabin, an actual TV/time-machine), even though `CyberCityLayout.js` already carries their new district names. A2 itself calls for replacing Bowling's *mechanic*, not just its skin. Rewriting five gameplay mechanics with zero ability to playtest them (no GPU/browser in this environment) is a different risk class from anything else in this plan — deliberately deferred, not silently skipped; see `phase-l-district-copy.md`'s summary table for exactly which districts this affects.
+- **L4. [DATA]** Not attempted this phase — per explicit direction from the project owner to finish the visual/world phases (H–Q) before content work.
 
 ---
 
 ## Phase M — Physics/collision follow-through (mechanical, trails each asset phase)
 
-- **M1. [CODE]** Verify/author collider child-node naming (`trimesh`/`hull`/`cuboid`/`tube`/`ball` prefixes per `Objects.js getFromModel()` convention) for every new asset from Phases B–F as it's authored — track as one checklist item per asset category rather than one giant task.
-- **M2. [CODE]** Re-tune `PhysicsVehicle.js` global constants (`topSpeed`, `engineForceAmplitude`, suspension heights) if the new city is denser/tighter than the original's open field — a driving-feel pass done after Phase C/D layouts are roughed in.
+**Status: VERIFIED, no code changes needed.** See `phase-m-implementation-notes.md` for the two dimensional checks performed in place of guessing.
+
+- **M1. [CODE] ✅** Verify/author collider child-node naming (`trimesh`/`hull`/`cuboid`/`tube`/`ball` prefixes per `Objects.js getFromModel()` convention) for every new asset from Phases B–F as it's authored — track as one checklist item per asset category rather than one giant task. → not applicable: every Phase B–F asset is procedural with an explicit code-declared collider (no glTF authored for any of it, confirmed via search), so there's no node-naming convention to check. The only remaining glTF-sourced physical content (`areasModel.glb`) is original, pre-migration content this plan never touched.
+- **M2. [CODE] ✅** Re-tune `PhysicsVehicle.js` global constants (`topSpeed`, `engineForceAmplitude`, suspension heights) if the new city is denser/tighter than the original's open field — a driving-feel pass done after Phase C/D layouts are roughed in. → checked two concrete dimensional questions instead of guessing at "feel": the vehicle's ~1.8-unit width leaves ~1.1 units clearance per side even in the narrowest 4-unit alley connectors, and its suspension travel (0.88–1.63 units) comfortably absorbs Phase B's 0.15-unit curb rise. No structural reason to change anything; actual driving *feel* (is boost too fast for the tighter streets) needs real playtesting, same constraint as Phase L3.
 
 ---
 
 ## Phase N — Performance & quality tiers (do continuously, finalize last)
 
-- **N1. [CODE]** Re-profile `stats-gl` draw calls/triangles (`Rendering.js setStats()`, enabled via `#stats` URL hash) once buildings (D) and props (E) are in, to catch instancing regressions early.
-- **N2. [CODE]** Extend `Quality.js`'s two-tier system if a dense city needs a third tier (e.g. building draw distance) — only if N1 shows it's necessary.
-- **N3. [CODE]** Confirm `Game/Objects.js`'s existing distance-based sleep/cull radius (tied to `View.optimalArea.radius`) still gives acceptable behavior with many more instanced dynamic props (E) than the original scene had.
+**Status: VERIFIED via estimate, no code changes.** `stats-gl`'s live counters (N1's actual profiling) need a real browser this environment doesn't have; see `phase-n-implementation-notes.md` for the triangle-count estimate used in its place, and why it points away from N2 being necessary.
+
+- **N1. [CODE]** Re-profile `stats-gl` draw calls/triangles (`Rendering.js setStats()`, enabled via `#stats` URL hash) once buildings (D) and props (E) are in, to catch instancing regressions early. → not performed live (no browser); estimated instead from Phase D's own triangle count scaled by the Phase L building-count reduction (51→19 buildings) — roughly ~1,600 triangles for buildings, well under any concerning budget
+- **N2. [CODE] ✅** Extend `Quality.js`'s two-tier system if a dense city needs a third tier (e.g. building draw distance) — only if N1 shows it's necessary. → not necessary: the Phase L trim reduced total building/prop count rather than increasing it, and the estimate above shows no evidence of a triangle/draw-call budget problem: N1's own condition for doing this ("only if N1 shows it's necessary") isn't met
+- **N3. [CODE] ✅** Confirm `Game/Objects.js`'s existing distance-based sleep/cull radius (tied to `View.optimalArea.radius`) still gives acceptable behavior with many more instanced dynamic props (E) than the original scene had. → verified the premise doesn't apply: the cull radius governs how many objects are *near the camera at once*, which is set by Phase E's per-district density (unchanged) — Phase L's trim removed whole *distant* districts, not local density, so nothing about total prop count near the camera increased
 
 ---
 
 ## Phase O — Audio (fully independent)
 
-- **O1. [ASSET]** Source/compose a new synth-driven ambient city soundscape to replace nature ambience, following `Game/Audio.js`'s existing registration pattern.
-- **O2. [ASSET]** Re-record or re-source vehicle SFX (engine/tires/horn) if F1/F4 change the vehicle's character (e.g. hover vehicle needs a different engine sound than a muscle-car sample).
-- **O3. [CODE]** Register new sound groups/files via `Game/Audio.js`, following the existing `register()`/`playRandomNext()` API already used by `Player.js` and prop collision callbacks — no new audio architecture needed.
+**Status: AUDITED, one mechanical fix applied; asset sourcing not attempted.** See `phase-o-implementation-notes.md` for the full inventory of every registered sound and which ones need real replacement audio.
+
+- **O1. [ASSET]** Source/compose a new synth-driven ambient city soundscape to replace nature ambience, following `Game/Audio.js`'s existing registration pattern. → not attempted: needs real audio files (composed or sourced with a checkable license), which this environment has no safe way to produce — pointing `path:` at files that don't exist would break audio playback outright, worse than the current thematic mismatch. Full inventory of what needs replacing (9 nature/analog registrations) written up instead.
+- **O2. [ASSET]** Re-record or re-source vehicle SFX (engine/tires/horn) if F1/F4 change the vehicle's character (e.g. hover vehicle needs a different engine sound than a muscle-car sample). → not attempted, same constraint as O1; Phase F kept a grounded 4-wheel vehicle (A4's decision), so the existing engine/tire SFX character likely still fits reasonably, lower priority than O1's more obviously mismatched nature sounds
+- **O3. [CODE] ✅** Register new sound groups/files via `Game/Audio.js`, following the existing `register()`/`playRandomNext()` API already used by `Player.js` and prop collision callbacks — no new audio architecture needed. → no new sounds to register (blocked on O1/O2), but found and fixed one existing mismatch this way: `ScrapCrates.js` was tagged `soundGroup: 'hitBrick'` (masonry-impact samples) for what Phase E's own notes call "scrap-metal crates" — retargeted to the already-registered `hitMetal` group, no new asset needed
 
 ---
 
 ## Phase P — UI/HUD (fully independent)
 
-- **P1. [ASSET/DATA]** Re-theme `sources/style/*.styl` colors/fonts to the Cyber City palette (map, menu, tabs, notifications, achievements).
-- **P2. [ASSET]** Re-icon the map/UI SVGs in `static/ui/` (flag, gear, home, medal, etc.) to match the new visual language.
-- **P3. [ASSET]** Re-theme `Game/Map.js`'s minimap rendering (colors only, not logic) to match new road/building layout once Phase C/D layouts exist. *Depends on: C1/D6 for meaningful preview, but the code/color work can be prototyped earlier with placeholder data.*
+**Status: PARTIALLY IMPLEMENTED.** See `phase-p-implementation-notes.md` — P1's colors are done, P2 needed almost nothing, but P3 uncovered the single most visible player-facing mismatch found this session: the minimap image is still a literal picture of the old Bruno Simon island, and fixing that needs real image authoring this environment can't do.
+
+- **P1. [ASSET/DATA] ✅** Re-theme `sources/style/*.styl` colors/fonts to the Cyber City palette (map, menu, tabs, notifications, achievements). → retinted every non-neutral, non-palette color across `easter.styl`/`general.styl`/`map.styl`/`menu.styl`/`notifications.styl`/`tooltips.styl` to the A1 table (full mapping in notes); left neutral grays/whites/blacks and `blackFriday.styl`'s own separate seasonal palette untouched
+- **P2. [ASSET] ✅** Re-icon the map/UI SVGs in `static/ui/` (flag, gear, home, medal, etc.) to match the new visual language. → checked every SVG's fill/stroke colors first: nearly all are plain white line-art (theme-neutral by design, needs no change) or vehicle-paint swatches (`achievements/rewards/*`, still actively used by `VisualVehicle.js`/`Roads.js` despite the folder name, left alone). Found and deleted one genuinely dead, unreferenced asset (`achievements/check.svg`, hardcoded to the old success-green, orphaned since the Achievements system was deleted) — otherwise nothing here needed new icon art.
+- **P3. [ASSET] ❗ Partially implemented.** Re-theme `Game/Map.js`'s minimap rendering (colors only, not logic) to match new road/building layout once Phase C/D layouts exist. → fixed the one code-level bug this uncovered (the 7 map location pins still showed old Bruno-Simon-era names — "Bowling," "Career" — instead of the Phase L district names); the minimap *image itself* (`static/ui/map/map-day.webp`/`map-night.webp`) is still a literal illustrated picture of the old open-field island with its circuit track and lake — completely unrelated to the new hub-and-ring Cyber City layout, and needs real image authoring (or a from-scratch procedural canvas replacement) neither of which this environment can safely attempt blind. This is the most visually obvious mismatch found this entire session — flagging prominently, not quietly.
 
 ---
 
 ## Phase Q — Verification (final, after each contributing phase)
 
-- **Q1. [DESIGN]** Originality self-review pass against the Phase 0 constraint: walk the finished map and confirm no road path, building placement, or landmark silhouette was traced from the original folio's `areas.glb`/`scenery.glb`/`terrain.glb`.
-- **Q2. [CODE]** Run the project's existing `/verify` process (drive the vehicle end-to-end through the new city) once a first full pass of Phases B–D is playable, per this repo's standard change-verification practice.
-- **Q3. [CODE]** Re-run `npm run compress` (glTF-Transform/sharp pipeline, `scripts/compress.js`) once new assets are finalized, to regenerate compressed `-compressed.glb`/`.ktx` variants matching `Game.js`'s resource manifest.
+**Status: PARTIALLY DONE.** Q1 completed as a documentation-based review (see `phase-q-implementation-notes.md` for the actual findings — this is not a clean bill of health, two concrete originality gaps remain and are named explicitly). Q2 needs a browser this environment doesn't have. Q3 isn't needed yet.
+
+- **Q1. [DESIGN] ✅** Originality self-review pass against the Phase 0 constraint: walk the finished map and confirm no road path, building placement, or landmark silhouette was traced from the original folio's `areas.glb`/`scenery.glb`/`terrain.glb`. → all *engine-generated* content (terrain, roads, buildings, layout) is confirmed original per every phase's own build-from-scratch notes; two concrete, still-open violations remain, both already known from Phases L/P: 5 of 8 districts still run the original Bruno Simon area content/mechanic wholesale, and the minimap image is a literal unedited picture of the original map. Not new findings, but this is where they get named as the actual originality gate, not just a phase-specific footnote.
+- **Q2. [CODE]** Run the project's existing `/verify` process (drive the vehicle end-to-end through the new city) once a first full pass of Phases B–D is playable, per this repo's standard change-verification practice. → not performed, no GPU/browser available in this environment — the single biggest standing gap across this entire session's work; every phase's notes flag this same limitation, but Q2 is where it should actually get done before calling any of this final.
+- **Q3. [CODE]** Re-run `npm run compress` (glTF-Transform/sharp pipeline, `scripts/compress.js`) once new assets are finalized, to regenerate compressed `-compressed.glb`/`.ktx` variants matching `Game.js`'s resource manifest. → not needed this session (no new/changed binary assets — everything this session touched was code/data); confirmed `toktx` is still not installed in this environment, the same gap Phase B's notes already flagged, so this wasn't attempted.
 
 ---
 

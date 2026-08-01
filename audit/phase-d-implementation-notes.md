@@ -2,6 +2,8 @@
 
 Status: **IMPLEMENTED**. Covers `cyber-city-migration-plan.md`'s D1–D8. There was no building system in the original game — this is entirely new content.
 
+**Incident, then restored:** commit `443974e` ("Refactor portfolio: Remove achievements, circuit, and behind-the-scenes sections...") deleted `Buildings.js`, `CyberCityBuildingArchetypes.js`, and `CyberCityBuildingPlacements.js` along with their two-line wiring in `World.js` — despite the commit message never mentioning buildings/skyline, strongly suggesting this was accidental fallout from that cleanup rather than a deliberate scope cut. Restored verbatim from the parent commit (`9756833`) during Phase K's work, once the gap was noticed (an empty skyline undercuts the exact "vertical density = dense city" premise Phase K's bloom tuning and A1's brief both depend on) and confirmed with the project owner. `World.js`'s import + `this.buildings = new Buildings()` were re-added by hand (the surrounding file had changed since — `Snow` removed, `Leaves`→`Litter`, `WaterSurface` removed — so this was a manual re-insertion at the same call site, not a blind revert). Everything below this point describes the original Phase D work; nothing in it needed to change post-restoration.
+
 ## What changed (all new files, nothing pre-existing was modified except wiring)
 
 | Task | File(s) | What |

@@ -110,21 +110,6 @@ export class Weather
             }
         )
 
-        // Snow
-        this.addProperty(
-            'snow',
-            -1,
-            1,
-            () =>
-            {
-                const rainRatio = remapClamp(this.rain.value, 0.05, 0.3, 0, 1)
-                const freezeRatio = remapClamp(this.temperature.value, 0, -5, 0, 1)
-                const meltRatio = remapClamp(this.temperature.value, 0, 10, 0, -1)
-
-                return rainRatio * freezeRatio + meltRatio
-            }
-        )
-        
         this.game.ticker.events.on('tick', () =>
         {
             this.update()

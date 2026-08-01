@@ -2,7 +2,7 @@ import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
 import { attribute, clamp, color, float, Fn, fract, hash, instancedArray, instanceIndex, max, mod, normalWorld, positionGeometry, rotateUV, sin, smoothstep, step, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
-import { lerp, remap, remapClamp } from '../utilities/maths.js'
+import { remapClamp } from '../utilities/maths.js'
 
 export class RainLines
 {
@@ -59,12 +59,7 @@ export class RainLines
             { label: 'length', min: 0, max: 10, step: 0.001 },
             () =>
             {
-                const baseLength = remapClamp(this.game.weather.rain.value, 0, 1, 1, 3)
-
-                const snowRatio = 1 - Math.pow(1 - Math.max(this.game.weather.snow.value, 0), 4)
-                const snowLength = 0.03
-
-                return lerp(baseLength, snowLength, snowRatio)
+                return remapClamp(this.game.weather.rain.value, 0, 1, 1, 3)
             }
         )
 
@@ -75,12 +70,7 @@ export class RainLines
             { label: 'speed', min: 0, max: 1, step: 0.001 },
             () =>
             {
-                const baseSpeed = remapClamp(this.game.weather.rain.value, 0, 1, 0.2, 0.4)
-
-                const snowRatio = 1 - Math.pow(1 - Math.max(this.game.weather.snow.value, 0), 4)
-                const snowSpeed = 0.05
-
-                return lerp(baseSpeed, snowSpeed, snowRatio)
+                return remapClamp(this.game.weather.rain.value, 0, 1, 0.2, 0.4)
             }
         )
 

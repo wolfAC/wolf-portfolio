@@ -24,6 +24,7 @@ export class Areas
             [ 'projects', ProjectsArea ],
             [ 'toilet', ToiletArea ],
             [ 'timeMachine', TimeMachineArea ],
+            [ 'easter', EasterArea ],
         ]
 
         const model = [...this.game.resources.areasModel.scene.children]

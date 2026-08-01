@@ -22,11 +22,6 @@ export class Terrain
 
         this.setGradient()
         this.setNodes()
-
-        this.game.ticker.events.on('tick', () =>
-        {
-            this.update()
-        }, 10)
     }
 
     setGradient()
@@ -86,7 +81,6 @@ export class Terrain
         // terrainTexture channels (Cyber City convention, see audit/phase-b-implementation-notes.md):
         // r = sidewalkMask, g = roadMask, b = heightMask (0 = road level, 1 = curb/sidewalk level)
         this.roadTintColorUniform = uniform(color('#1c1b22'))
-        this.tracksDelta = uniform(vec2(0))
 
         const worldPositionToUvNode = Fn(([position]) =>
         {
@@ -96,16 +90,7 @@ export class Terrain
         this.terrainNode = Fn(([position]) =>
         {
             const textureUv = worldPositionToUvNode(position)
-            const data = texture(this.game.resources.terrainTexture, textureUv)
-
-            // Wheel tracks: driving off-road wears the sidewalk mask down to a road-like look
-            const groundDataColor = texture(
-                this.game.tracks.renderTarget.texture,
-                position.sub(- this.game.tracks.halfSize).sub(this.tracksDelta).div(this.game.tracks.size)
-            )
-            data.r.mulAssign(groundDataColor.r.oneMinus())
-
-            return data
+            return texture(this.game.resources.terrainTexture, textureUv)
         })
 
         this.colorNode = Fn(([terrainData]) =>
@@ -124,14 +109,5 @@ export class Terrain
         {
             this.game.debug.addThreeColorBinding(this.debugPanel, this.roadTintColorUniform.value, 'roadTintColor')
         }
-    }
-    
-    update()
-    {
-        // Tracks delta
-        this.tracksDelta.value.set(
-            this.game.tracks.focusPoint.x,
-            this.game.tracks.focusPoint.y
-        )
     }
 }

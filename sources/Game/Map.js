@@ -39,15 +39,21 @@ export class Map
 
     setLocations()
     {
+        // Phase P: display names updated to the Cyber City district names
+        // (audit/phase-l-district-copy.md) -- respawnName keys are unchanged,
+        // those are Respawns.js identifiers, not player-facing text. Note
+        // 'toilet'/Malfunction Stall has never had an entry here (not added
+        // now -- unclear whether that's an intentional hidden secret or an
+        // oversight, see phase-p-implementation-notes.md).
         this.locations = {}
         this.locations.items = [
-            { name: 'Altar', respawnName: 'altar', offset: { x: 0, y: -0.05 } },
-            { name: 'Bowling', respawnName: 'bowling', offset: { x: -0.08, y: 0.03 } },
-            { name: 'Career', respawnName: 'career', offset: { x: 0, y: -0.06 } },
-            { name: 'Cookie', respawnName: 'cookie', offset: { x: -0.02, y: -0.01 } },
-            { name: 'Landing', respawnName: 'landing', offset: { x: 0.02, y: 0 } },
-            { name: 'Projects', respawnName: 'projects', offset: { x: 0, y: -0.02 } },
-            { name: 'Time Machine', respawnName: 'timeMachine', offset: { x: 0, y: 0 } },
+            { name: 'Server Shrine', respawnName: 'altar', offset: { x: 0, y: -0.05 } },
+            { name: 'Overclock Arcade', respawnName: 'bowling', offset: { x: -0.08, y: 0.03 } },
+            { name: 'Corporate Spire District', respawnName: 'career', offset: { x: 0, y: -0.06 } },
+            { name: 'Glitch Vendor Alley', respawnName: 'cookie', offset: { x: -0.02, y: -0.01 } },
+            { name: 'Transit Nexus', respawnName: 'landing', offset: { x: 0.02, y: 0 } },
+            { name: 'Holo-Bazaar', respawnName: 'projects', offset: { x: 0, y: -0.02 } },
+            { name: 'Chrono Terminal', respawnName: 'timeMachine', offset: { x: 0, y: 0 } },
         ]
 
         for(const item of this.locations.items)

@@ -32,16 +32,18 @@ export const CYBER_CITY_LAYOUT = {
         width: 4
     },
     sidewalkWidth: 2,
+    // Trimmed from 6 districts / 6 alley nodes to 2 / 5 (Phase L): broadcastPlaza (social),
+    // undercroftYard (lab), skylineObservatory (achievements), devCircuit (circuit), and
+    // archiveSubstation (behindTheScene) pointed at Area classes deleted in commit 443974e,
+    // leaving fully-built roads/buildings/props with no content at the other end. Rather than
+    // leave dead-end plazas, those slots were removed outright -- see phase-l-implementation-notes.md
+    // for the reasoning and for where the two orphaned hero landmarks (skylineObservatory,
+    // broadcastPlaza) were relocated to instead of being deleted with their districts.
     districts: [
         { id: 'corporateSpire',      name: 'Corporate Spire District',    area: 'career',       angleDeg: 0,   radius: 112, footprintRadius: 15, position: { x: 112.0,  z: 0.0 } },
-        { id: 'holoBazaar',          name: 'Holo-Bazaar',                 area: 'projects',     angleDeg: 60,  radius: 112, footprintRadius: 15, position: { x: 56.0,   z: 96.99 } },
-        { id: 'broadcastPlaza',      name: 'Broadcast Tower Plaza',       area: 'social',       angleDeg: 120, radius: 112, footprintRadius: 15, position: { x: -56.0,  z: 96.99 } },
-        { id: 'undercroftYard',      name: 'Undercroft Fabrication Yard', area: 'lab',          angleDeg: 180, radius: 112, footprintRadius: 15, position: { x: -112.0, z: 0.0 } },
-        { id: 'skylineObservatory',  name: 'Skyline Observatory',         area: 'achievements', angleDeg: 240, radius: 112, footprintRadius: 15, position: { x: -56.0,  z: -96.99 } },
-        { id: 'devCircuit',          name: 'Dev Circuit',                 area: 'circuit',      angleDeg: 300, radius: 112, footprintRadius: 15, position: { x: 56.0,   z: -96.99 } }
+        { id: 'holoBazaar',          name: 'Holo-Bazaar',                 area: 'projects',     angleDeg: 60,  radius: 112, footprintRadius: 15, position: { x: 56.0,   z: 96.99 } }
     ],
     alleyNodes: [
-        { id: 'archiveSubstation',  name: 'Archive Substation',   area: 'behindTheScene', angleDeg: 30,  radius: 80, footprintRadius: 8, position: { x: 69.28,  z: 40.0 } },
         { id: 'overclockArcade',    name: 'Overclock Arcade',     area: 'bowling',        angleDeg: 90,  radius: 80, footprintRadius: 8, position: { x: 0.0,    z: 80.0 } },
         { id: 'serverShrine',       name: 'Server Shrine',        area: 'altar',          angleDeg: 150, radius: 80, footprintRadius: 8, position: { x: -69.28, z: 40.0 } },
         { id: 'glitchVendorAlley',  name: 'Glitch Vendor Alley',  area: 'cookie',         angleDeg: 210, radius: 80, footprintRadius: 8, position: { x: -69.28, z: -40.0 } },

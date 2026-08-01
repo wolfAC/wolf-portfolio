@@ -588,7 +588,17 @@ export class PhysicsVehicle
         // Various measures
         const newPosition = new THREE.Vector3().copy(this.chassis.physical.body.translation())
         this.velocity = newPosition.clone().sub(this.position)
-        this.direction = this.velocity.clone().normalize()
+
+        // Guard against normalizing a near-zero vector: at rest this frame-to-frame
+        // position delta is dominated by contact-solver/floating-point noise, which
+        // points in an essentially arbitrary direction -- normalizing that noise
+        // turns it into a full unit vector that flips around every frame, which
+        // forwardRatio/forwardSpeed (and anything driven by them, like the visual
+        // wheels' roll direction) then inherits as a visible idle wobble. Below
+        // this threshold, keep the last known direction instead of normalizing noise.
+        if(this.velocity.lengthSq() > 0.000001)
+            this.direction = this.velocity.clone().normalize()
+
         this.position.copy(newPosition)
         this.quaternion.copy(this.chassis.physical.body.rotation())
         this.sideward.set(0, 0, 1).applyQuaternion(this.quaternion)

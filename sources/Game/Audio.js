@@ -404,23 +404,6 @@ export class Audio
             })
         }
 
-        // Jingle bells
-        this.register({
-            group: 'jingleBells',
-            path: 'sounds/jingleBells/Mountain Audio - Christmas Bells.mp3',
-            autoplay: true,
-            loop: true,
-            volume: 0,
-            onPlaying: (item) =>
-            {
-                const sine = Math.sin(this.game.ticker.elapsedScaled * 0.1) * 0.5 + 0.5
-                const targetVolume = Math.max(0, this.game.weather.snow.value) * 0.35 * sine
-
-                const easing = targetVolume > item.volume ? 0.005 : 0.05
-                item.volume += (targetVolume - item.volume) * this.game.ticker.deltaScaled * easing
-            }
-        })
-
         // Rain
         this.register({
             group: 'rain',
@@ -430,9 +413,7 @@ export class Audio
             volume: 0,
             onPlaying: (item) =>
             {
-                const snowAttenuation = remapClamp(this.game.weather.snow.value, 0, 0.6, 1, 0)
-                const rainVolume = remapClamp(this.game.weather.rain.value, 0.1, 0.6, 0, 1)
-                item.volume = rainVolume * snowAttenuation
+                item.volume = remapClamp(this.game.weather.rain.value, 0.1, 0.6, 0, 1)
             }
         })
 

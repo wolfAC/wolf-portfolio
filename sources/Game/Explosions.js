@@ -19,8 +19,8 @@ export class Explosions
         const rollKickStrength = remapClamp(distance, 2, 15, 1, 0)
         this.game.view.roll.kick(rollKickStrength)
 
-        // Leaves
-        this.game.world.leaves?.explode(coordinates, radius)
+        // Litter
+        this.game.world.litter?.explode(coordinates, radius)
 
         // Objects physics
         const applyPhysicsExplosion = (physicalObject) =>

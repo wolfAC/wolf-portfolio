@@ -43,7 +43,7 @@ export class ScrapCrates
             friction: 0.7,
             mass: 0.1,
             contactThreshold: 15,
-            soundGroup: 'hitBrick',
+            soundGroup: 'hitMetal', // was 'hitBrick' -- these are scrap-metal crates, not masonry; see phase-o-implementation-notes.md
         })
 
         this.instancedGroup = instancedGroup

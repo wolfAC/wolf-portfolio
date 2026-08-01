@@ -1,20 +1,20 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { color, float, Fn, hash, instancedArray, instanceIndex, materialNormal, max, mix, mod, modelViewMatrix, normalWorld, positionGeometry, remapClamp, rotateUV, sin, smoothstep, step, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
+import { color, float, Fn, hash, instancedArray, instanceIndex, materialNormal, max, mix, mod, modelViewMatrix, normalWorld, positionGeometry, remapClamp, rotateUV, sin, smoothstep, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
 import { remap } from '../utilities/maths.js'
 import gsap from 'gsap'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 
-export class Leaves
+export class Litter
 {
     constructor()
     {
         this.game = Game.getInstance()
 
-        // if(this.game.yearCycles.properties.leaves.value < 0.25)
+        // if(this.game.yearCycles.properties.litter.value < 0.25)
         //     return
 
-        const power = Math.round(remap((this.game.yearCycles.properties.leaves.value), 0.25, 1, 7, 11))
+        const power = Math.round(remap((this.game.yearCycles.properties.litter.value), 0.25, 1, 7, 11))
         this.count = Math.pow(2, power)
         // this.count = Math.pow(2, 12)
 
@@ -22,7 +22,7 @@ export class Leaves
         if(this.game.debug.active)
         {
             this.debugPanel = this.game.debug.panel.addFolder({
-                title: '🍃 Leaves',
+                title: '🗑️ Litter',
                 expanded: false,
             })
         }
@@ -66,7 +66,6 @@ export class Leaves
         this.windMultiplier = uniform(0.5)
         this.upwardMultiplier = uniform(1)
         this.defaultDamping = uniform(1.5)
-        this.waterDamping = uniform(0.75)
         this.gravity = uniform(9.807)
         this.explosion = uniform(vec4(0))
         this.tornado = uniform(vec4(0))
@@ -80,22 +79,22 @@ export class Leaves
         for(let i = 0; i < this.count; i++)
             baseRotationArray[i] = Math.random() * Math.PI * 2
         const baseRotationBuffer = instancedArray(baseRotationArray, 'float').toAttribute()
-        
+
         // Scale
         const scaleArray = new Float32Array(this.count)
         for(let i = 0; i < this.count; i++)
             scaleArray[i] = Math.random() * 0.5 + 0.5
         const scaleBuffer = instancedArray(scaleArray, 'float').toAttribute()
-        
+
         // Weight
         const weightArray = new Float32Array(this.count)
         for(let i = 0; i < this.count; i++)
             weightArray[i] = Math.random() * 0.1 + 0.1
         const weightBuffer = instancedArray(weightArray, 'float')
 
-        // Color buffer
-        const colorA = uniform(color(0x95513a))// 0x999257
-        const colorB = uniform(color(0xf56a3a))// 0xcc8214
+        // Color buffer -- muted grime/paper tones (A1 palette: sidewalk/curb base + a faded paper tan)
+        const colorA = uniform(color('#2a2733'))
+        const colorB = uniform(color('#7a7264'))
         const colorNode = Fn(() =>
         {
             const mixStrength = hash(instanceIndex.add(99))
@@ -128,21 +127,21 @@ export class Leaves
             materialNormal.assign(modelViewMatrix.mul(vec4(normalBuffer, 0)))
 
             // Position
-            const leavePosition = this.positionBuffer.toAttribute()
+            const debrisPosition = this.positionBuffer.toAttribute()
 
             const newPosition = positionGeometry.mul(scaleBuffer).mul(this.scale)
 
-            const rotationMultiplier = max(leavePosition.y.mul(this.rotationElevationMultiplier), 0)
-            
-            const rotationZ = sin(leavePosition.x.mul(this.rotationFrequency)).mul(rotationMultiplier)
-            const rotationX = sin(leavePosition.z.mul(this.rotationFrequency)).mul(rotationMultiplier)
+            const rotationMultiplier = max(debrisPosition.y.mul(this.rotationElevationMultiplier), 0)
+
+            const rotationZ = sin(debrisPosition.x.mul(this.rotationFrequency)).mul(rotationMultiplier)
+            const rotationX = sin(debrisPosition.z.mul(this.rotationFrequency)).mul(rotationMultiplier)
             const rotationY = baseRotationBuffer
 
             newPosition.xy.assign(rotateUV(newPosition.xy, rotationZ, vec2(0)))
             newPosition.yz.assign(rotateUV(newPosition.yz, rotationX, vec2(0)))
             newPosition.xz.assign(rotateUV(newPosition.xz, rotationY, vec2(0)))
 
-            return newPosition.add(leavePosition)
+            return newPosition.add(debrisPosition)
         })()
 
         this.size = float(this.game.view.optimalArea.radius * 2)
@@ -152,7 +151,7 @@ export class Leaves
         {
             // Position
             const position = this.positionBuffer.element(instanceIndex)
-            
+
             position.assign(vec3(
                 hash(instanceIndex).sub(0.5).mul(this.size),
                 0,
@@ -174,10 +173,6 @@ export class Leaves
             const velocity = this.velocityBuffer.element(instanceIndex)
             const weight = weightBuffer.element(instanceIndex)
 
-            // Terrain
-            // const terrainUv = this.game.terrain.worldPositionToUvNode(position.xz)
-            const terrainData = this.game.terrain.terrainNode(position.xz)
-            
             // Push from vehicle
             const vehicleDelta = position.sub(this.vehiclePosition)
 
@@ -206,34 +201,15 @@ export class Leaves
             const explosionMultiplier = distanceToExplosion.remapClamp(this.explosion.z.mul(0.5), this.explosion.z.mul(1), 0.2, 0)
             const explosionDirection = vec2(explosionDelta.x, explosionDelta.y)
             const explosionPush = explosionDirection.mul(explosionMultiplier).mul(this.explosion.a)
-            
+
             velocity.addAssign(vec3(explosionPush.x, 0, explosionPush.y))
-
-            // //Tornado
-            // const toTornado = this.tornado.sub(position)
-            // const tornadoDistance = toTornado.length()
-            // const strength = remapClamp(tornadoDistance, 20, 2, 0, 1)
-            // const sideAngleStrength = remapClamp(tornadoDistance, 8, 2, 0, Math.PI * 0.25)
-
-            // const force = toTornado.clone().normalize()
-
-            // const sideAngleStrength = remapClamp(tornadoDistance, 8, 2, 0, Math.PI * 0.25)
-            // force.applyAxisAngle(new THREE.Vector3(0, 1, 0), -sideAngleStrength)
-
-            // const flyForce = remapClamp(tornadoDistance, 8, 2, 0, 1)
-            // force.y = flyForce * 2
-
-            // force.setLength(strength * this.game.ticker.deltaScaled * this.game.tornado.strength * 30)
-            // this.chassis.physical.body.applyImpulse(force)
 
             // Upward fly
             const upwardDim = position.y.remapClamp(0, 6, 1, 0)
             velocity.y = velocity.xz.length().min(2).mul(this.upwardMultiplier).mul(upwardDim)
 
-            // Damping
-            const groundDamping = terrainData.b.remapClamp(0.4, 0, this.waterDamping, this.defaultDamping) // Low on water
-            const inTheAirDamping = step(0.05, position.y).mul(this.defaultDamping) // High in the air
-            const damping = max(groundDamping, inTheAirDamping).mul(this.game.ticker.deltaScaledUniform)
+            // Damping (city terrain has no wet/water ground state post-Phase-B's channel remap; see phase-j-implementation-notes.md)
+            const damping = this.defaultDamping.mul(this.game.ticker.deltaScaledUniform)
             velocity.mulAssign(float(1).sub(damping))
 
             // Gravity
@@ -242,9 +218,8 @@ export class Leaves
             // Apply velocity
             position.addAssign(velocity.mul(this.game.ticker.deltaScaledUniform))
 
-            // Clamp to floor / water
-            const floorY = terrainData.b.remapClamp(0.02, 0.13, 0, this.game.water.surfaceElevationUniform).add(0.02)
-            position.y.assign(max(position.y, floorY))
+            // Clamp to floor
+            position.y.assign(max(position.y, 0.02))
 
             // Loop
             const halfSize = this.size.mul(0.5)
@@ -268,7 +243,6 @@ export class Leaves
             this.debugPanel.addBinding(this.windMultiplier, 'value', { label: 'windMultiplier', min: 0, max: 10, step: 0.0001 })
             this.debugPanel.addBinding(this.upwardMultiplier, 'value', { label: 'upwardMultiplier', min: 0, max: 10, step: 0.01 })
             this.debugPanel.addBinding(this.defaultDamping, 'value', { label: 'defaultDamping', min: 0, max: 10, step: 0.01 })
-            this.debugPanel.addBinding(this.waterDamping, 'value', { label: 'waterDamping', min: 0, max: 10, step: 0.01 })
             this.debugPanel.addBinding(this.gravity, 'value', { label: 'gravity', min: 0, max: 20, step: 0.01 })
         }
     }

@@ -18,7 +18,11 @@ class CheapDOFNode extends TempNode
 		this.size = uniform(2)
 		this.separation = uniform(1.25)
 		this.start = uniform(0.2)
-		this.end = uniform(0.5)
+		// Phase K3: widened from 0.5 -- the restored Buildings.js skyline now fills more of the
+		// frame's upper/lower thirds than the original open field did, and blurring building
+		// facades/windows away defeats their per-window lit/flicker detail (Phase D) and the
+		// bloom pass (Phase K1) meant to make them read as neon. See phase-k-implementation-notes.md.
+		this.end = uniform(0.62)
 
 		this.repeats = uniform(25)
 		this.amount = uniform(0.003)

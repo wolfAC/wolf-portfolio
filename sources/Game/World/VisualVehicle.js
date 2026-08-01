@@ -83,6 +83,13 @@ export class VisualVehicle
             'gunBarrelRight',
             'muzzleFlashLeft',
             'muzzleFlashRight',
+            'boostReference',
+            'wheelSteerFrontLeft',
+            'wheelSpinFrontLeft',
+            'wheelSteerFrontRight',
+            'wheelSpinFrontRight',
+            'wheelSpinRearLeft',
+            'wheelSpinRearRight',
         ]
         for(let i = 0; i < searchList.length; i++)
         {
@@ -260,6 +267,20 @@ export class VisualVehicle
         this.wheels.items = []
         this.wheels.steering = 0
 
+        // Matches PhysicsVehicle.js's wheel index order (front-right,
+        // front-left, rear-right, rear-left -- see its wheelsPositions array).
+        // These are the model's real, named skinned-rig bones (see
+        // WHEEL_BONE_RENAMES in VehicleModel.js), distinct from the
+        // geometry-less wheelContainer/wheelCylinder placeholders cloned
+        // below -- rotating these is what actually spins/steers the visible
+        // wheel mesh instead of leaving it rigid.
+        const boneNames = [
+            { steer: 'wheelSteerFrontRight', spin: 'wheelSpinFrontRight' },
+            { steer: 'wheelSteerFrontLeft', spin: 'wheelSpinFrontLeft' },
+            { spin: 'wheelSpinRearRight' },
+            { spin: 'wheelSpinRearLeft' },
+        ]
+
         // Create wheels
         for(let i = 0; i < 4; i++)
         {
@@ -278,12 +299,15 @@ export class VisualVehicle
                 if(child.name.match(/^wheelPainted/))
                     wheel.painted = child
             })
-            
+
             // Cylinder (actual wheel)
             wheel.cylinder.position.set(0, 0, 0)
-            
+
             if(i === 0 || i === 2)
                 wheel.container.rotation.y = Math.PI
+
+            wheel.spinBone = this.parts[boneNames[i].spin] ?? null
+            wheel.steerBone = boneNames[i].steer ? (this.parts[boneNames[i].steer] ?? null) : null
 
             // Add new track
             wheel.groundTrack = this.game.tracks.add(new Track(0.5, 'r'))
@@ -377,19 +401,15 @@ export class VisualVehicle
         this.boostTrails = {}
         this.boostTrails.instance = new Trails()
 
-        this.boostTrails.leftReference = new THREE.Object3D()
-        this.boostTrails.leftReference.position.set(-1.28, 0.1, -0.55)
-        this.parts.chassis.add(this.boostTrails.leftReference)
-
-        this.boostTrails.left = this.boostTrails.instance.create()
-        this.boostTrails.leftReference.getWorldPosition(this.boostTrails.left.position)
-    
-        this.boostTrails.rightReference = new THREE.Object3D()
-        this.boostTrails.rightReference.position.set(-1.28, 0.1, 0.55)
-        this.parts.chassis.add(this.boostTrails.rightReference)
-
-        this.boostTrails.right = this.boostTrails.instance.create()
-        this.boostTrails.rightReference.getWorldPosition(this.boostTrails.right.position)
+        // Single trail, anchored on boostReference (built in VehicleModel.js,
+        // positioned at the rear-center of the model) -- guarded since older/
+        // alternate models may not define it, same as antenna/energy above.
+        if(this.parts.boostReference)
+        {
+            this.boostTrails.reference = this.parts.boostReference
+            this.boostTrails.trail = this.boostTrails.instance.create()
+            this.boostTrails.reference.getWorldPosition(this.boostTrails.trail.position)
+        }
     }
 
     setBoostAnimation()
@@ -466,7 +486,13 @@ export class VisualVehicle
         // Wheels
         this.wheels.steering += ((this.game.player.steering * physicalVehicle.steeringAmplitude) - this.wheels.steering) * this.game.ticker.deltaScaled * 16
 
-        const wheelsRotation = (physicalVehicle.forwardSpeed) / physicalVehicle.wheels.settings.radius * 0.006
+        // Deadzoned: forwardSpeed can carry tiny residual noise while the
+        // vehicle is otherwise at rest, which used to be harmless (it only
+        // ever drove the geometry-less wheelContainer/wheelCylinder
+        // placeholders) but now visibly wobbles the real wheel bones below.
+        const wheelsRotation = Math.abs(physicalVehicle.forwardSpeed) > 0.02
+            ? physicalVehicle.forwardSpeed / physicalVehicle.wheels.settings.radius * 0.006
+            : 0
 
         for(let i = 0; i < 4; i++)
         {
@@ -478,16 +504,32 @@ export class VisualVehicle
             if(!this.game.inputs.actions.get('brake').active || this.game.inputs.actions.get('forward').active || this.game.inputs.actions.get('backward').active)
             {
                 if(i === 0 || i === 2)
+                {
                     visualWheel.cylinder.rotation.z += wheelsRotation
+                    if(visualWheel.spinBone)
+                        visualWheel.spinBone.rotation.y += wheelsRotation
+                }
                 else
+                {
                     visualWheel.cylinder.rotation.z -= wheelsRotation
+                    if(visualWheel.spinBone)
+                        visualWheel.spinBone.rotation.y -= wheelsRotation
+                }
             }
 
             if(i === 0)
+            {
                 visualWheel.container.rotation.y = Math.PI + this.wheels.steering
+                if(visualWheel.steerBone)
+                    visualWheel.steerBone.rotation.z = this.wheels.steering
+            }
 
             if(i === 1)
+            {
                 visualWheel.container.rotation.y = this.wheels.steering
+                if(visualWheel.steerBone)
+                    visualWheel.steerBone.rotation.z = this.wheels.steering
+            }
   
             const suspensionLength = physicalWheel.suspensionLength
             let wheelY = physicalWheel.basePosition.y - suspensionLength
@@ -558,11 +600,12 @@ export class VisualVehicle
         }
 
         // Boost trails
-        const trailAlpha = physicalVehicle.goingForward && this.game.player.boosting && this.game.player.accelerating > 0 ? 1 : 0
-        this.boostTrails.leftReference.getWorldPosition(this.boostTrails.left.position)
-        this.boostTrails.left.alpha = trailAlpha
-        this.boostTrails.rightReference.getWorldPosition(this.boostTrails.right.position)
-        this.boostTrails.right.alpha = trailAlpha
+        if(this.boostTrails.reference)
+        {
+            const trailAlpha = physicalVehicle.goingForward && this.game.player.boosting && this.game.player.accelerating > 0 ? 1 : 0
+            this.boostTrails.reference.getWorldPosition(this.boostTrails.trail.position)
+            this.boostTrails.trail.alpha = trailAlpha
+        }
 
         // Boost animation
         this.boostAnimation.mix += (this.game.player.boosting ? 1 : - 1) * this.game.ticker.deltaScaled * this.boostAnimation.speed

@@ -1,6 +1,6 @@
 import * as THREE from 'three/webgpu'
 import { Game } from '../Game.js'
-import { cameraPosition, color, float, Fn, fwidth, max, mix, PI, positionWorld, texture, uniform, uv, vec3 } from 'three/tsl'
+import { cameraPosition, color, float, Fn, fwidth, max, mix, PI, positionWorld, texture, uniform, uv, vec2, vec3 } from 'three/tsl'
 import { MeshDefaultMaterial } from '../Materials/MeshDefaultMaterial.js'
 import { CYBER_CITY_LAYOUT } from './CyberCityLayout.js'
 
@@ -34,10 +34,13 @@ export class Roads
         this.setMaterial()
         this.setMesh()
 
+        // Priority 10, after View's optimalArea recompute (priority 7) -- update()
+        // reads this.game.view.optimalArea.radius/position for the ground-edge
+        // fade, which needs this frame's value, not last frame's stale one.
         this.game.ticker.events.on('tick', () =>
         {
             this.update()
-        })
+        }, 10)
     }
 
     setGeometry()
@@ -201,7 +204,8 @@ export class Roads
         // reusing the same technique already proven in VisualVehicle.js's
         // "abyssal" paint choice (view direction dot the surface normal). A
         // real screen-space reflection would need this codebase's more complex
-        // viewportSharedTexture/depth-reprojection plumbing (see WaterSurface.js)
+        // viewportSharedTexture/depth-reprojection plumbing (the technique the
+        // now-removed WaterSurface.js used; see phase-j-implementation-notes.md)
         // -- not attempted here since it can't be visually verified in this
         // environment; fresnel is simpler, already-proven, and still reads
         // convincingly as "wet asphalt catching light at a shallow angle."
@@ -218,6 +222,20 @@ export class Roads
         this.laneDashLength = uniform(3)
         this.laneGapLength = uniform(2)
         this.laneLineIntensity = uniform(0.8)
+
+        // Ground-edge fade: the city's road network (ring road radius 90,
+        // districts out to 112 -- see CyberCityLayout.js) reaches far past
+        // Floor.js's ground plane, which is deliberately sized/recentered
+        // each frame to only cover what's near the camera (a performance
+        // choice, not a bug). Roads.js's mesh is never distance-culled, so
+        // without this, distant road segments render at full neon brightness
+        // with no ground underneath them -- visible as a "floating road"
+        // past the edge of the world. Fading toward the fog color as the
+        // road approaches the ground's own edge keeps it visually consistent
+        // with where the ground disappears, whatever that radius happens to
+        // be on a given frame (zoom level, screen ratio, etc.).
+        this.groundRadius = uniform(0)
+        this.groundCenter = uniform(vec2(0, 0))
 
         const colorNode = Fn(() =>
         {
@@ -270,6 +288,11 @@ export class Roads
 
             const laneMask = lineMask.mul(dashMask).mul(this.laneLineIntensity)
             baseColor.assign(mix(baseColor, this.neonColorB, laneMask))
+
+            // Ground-edge fade (see groundRadius/groundCenter comment above)
+            const distanceFromGroundCenter = positionWorld.xz.sub(this.groundCenter).length()
+            const groundFade = distanceFromGroundCenter.smoothstep(this.groundRadius.mul(0.7), this.groundRadius)
+            baseColor.assign(mix(baseColor, this.game.fog.color, groundFade))
 
             return vec3(baseColor)
         })()
@@ -326,5 +349,8 @@ export class Roads
     update()
     {
         this.glitterVariation.value += this.game.ticker.deltaScaled * 0.004 + this.game.view.delta.length() * 0.004
+
+        this.groundRadius.value = this.game.view.optimalArea.radius
+        this.groundCenter.value.set(this.game.view.optimalArea.position.x, this.game.view.optimalArea.position.z)
     }
 }

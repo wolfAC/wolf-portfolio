@@ -1,5 +1,5 @@
 import * as THREE from 'three/webgpu'
-import { pass, mrt, output, emissive, renderOutput, vec4 } from 'three/tsl'
+import { pass, mrt, output, emissive, renderOutput, vec4, float, screenUV, uniform } from 'three/tsl'
 import { bloom } from 'three/addons/tsl/display/BloomNode.js'
 import { Game } from './Game.js'
 import { cheapDOF } from './Passes/cheapDOF.js'
@@ -80,18 +80,37 @@ export class Rendering
 
         this.bloomPass = bloom(scenePassColor)
         this.bloomPass._nMips = this.game.quality.level === 0 ? 5 : 2
-        this.bloomPass.threshold.value = 1
-        this.bloomPass.strength.value = 0.25
+        // Phase K: threshold lowered from 1 to 0.4 -- Buildings.js's window emissive is a raw
+        // palette hex color with no extra intensity multiplier (unlike Materials.js's emissive
+        // gradient presets, which already multiply by 1.5-2.7), so its luminance peaks well under
+        // the old threshold of 1 for most A1 neon hues (e.g. the neon-primary magenta #ff2e8a is
+        // ~0.38 luminance) and would never have bloomed at all. 0.4 clears every cataloged neon
+        // hue's luminance while staying well above the near-black structural base colors (~0.05-0.09).
+        this.bloomPass.threshold.value = 0.4
+        this.bloomPass.strength.value = 0.75
         this.bloomPass.smoothWidth.value = 1
 
         this.cheapDOFPass = cheapDOF(renderOutput(scenePass))
+
+        // Phase K2: subtle vignette, gated to quality level 0 only (same tier as cheapDOF) --
+        // a plain screenUV-radius falloff, deliberately not chromatic aberration/scanlines since
+        // those need visual tuning to avoid looking broken and this environment has no GPU/browser
+        // to check against; a radial darken can't go visually wrong the way those can.
+        this.vignetteStrength = uniform(0.35)
+        this.vignetteRadius = uniform(0.6)
+        this.vignetteSoftness = uniform(0.7)
+        const vignette = (inputNode) =>
+        {
+            const falloff = screenUV.length().smoothstep(this.vignetteRadius, this.vignetteRadius.add(this.vignetteSoftness))
+            return inputNode.mul(float(1).sub(falloff.mul(this.vignetteStrength)))
+        }
 
         // Quality
         const qualityChange = (level) =>
         {
             if(level === 0)
             {
-                this.postProcessing.outputNode = this.cheapDOFPass.add(this.bloomPass)
+                this.postProcessing.outputNode = vignette(this.cheapDOFPass.add(this.bloomPass))
             }
             else if(level === 1)
             {
@@ -116,13 +135,22 @@ export class Rendering
             bloomPanel.addBinding(this.bloomPass.radius, 'value', { label: 'radius', min: 0, max: 1, step: 0.01 })
             bloomPanel.addBinding(this.bloomPass.smoothWidth, 'value', { label: 'smoothWidth', min: 0, max: 1, step: 0.01 })
 
+            const vignettePanel = this.debugPanel.addFolder({
+                title: 'vignette',
+                expanded: false,
+            })
+
+            vignettePanel.addBinding(this.vignetteStrength, 'value', { label: 'strength', min: 0, max: 1, step: 0.01 })
+            vignettePanel.addBinding(this.vignetteRadius, 'value', { label: 'radius', min: 0, max: 1.4, step: 0.01 })
+            vignettePanel.addBinding(this.vignetteSoftness, 'value', { label: 'softness', min: 0, max: 1.4, step: 0.01 })
+
             const blurPanel = this.debugPanel.addFolder({
                 title: 'blur',
                 expanded: true,
             })
 
-            blurPanel.addBinding(this.cheapDOFPass.start, 'value', { label: 'start', min: 0, max: 0.5, step: 0.001 })
-            blurPanel.addBinding(this.cheapDOFPass.end, 'value', { label: 'end', min: 0, max: 0.5, step: 0.001 })
+            blurPanel.addBinding(this.cheapDOFPass.start, 'value', { label: 'start', min: 0, max: 0.8, step: 0.001 })
+            blurPanel.addBinding(this.cheapDOFPass.end, 'value', { label: 'end', min: 0, max: 0.8, step: 0.001 })
             // blurPanel.addBinding(this.cheapDOFPass.size, 'value', { label: 'size', min: 1, max: 5, step: 1 })
             // blurPanel.addBinding(this.cheapDOFPass.separation, 'value', { label: 'separation', min: 0, max: 5, step: 0.001 })
             blurPanel.addBinding(this.cheapDOFPass.repeats, 'value', { label: 'repeats', min: 1, max: 100, step: 1 })

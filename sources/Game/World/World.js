@@ -3,12 +3,10 @@ import { Game } from '../Game.js'
 import { Floor } from './Floor.js'
 import { Grid } from './Grid.js'
 import { color, float, Fn, instance, normalWorld, positionLocal, texture, vec3, vec4 } from 'three/tsl'
-import { WaterSurface } from './WaterSurface.js'
 import { Areas } from './Areas/Areas.js'
 import { WindLines } from './WindLines.js'
-import { Leaves } from './Leaves.js'
+import { Litter } from './Litter.js'
 import { Lightnings } from './Lightnings.js'
-import { Snow } from './Snow.js'
 import { Whispers } from './Whispers.js'
 import { VisualVehicle } from './VisualVehicle.js'
 import { VisualTornado } from './VisualTornado.js'
@@ -25,6 +23,7 @@ import { Barricades } from './Barricades.js'
 import { VendingMachines } from './VendingMachines.js'
 import { Scenery } from './Scenery.js'
 import { Roads } from './Roads.js'
+import { Buildings } from './Buildings.js'
 import { buildVehicleModel } from './VehicleModel.js'
 
 export class World
@@ -54,14 +53,12 @@ export class World
             this.visualVehicle = new VisualVehicle(buildVehicleModel('default'))
             this.floor = new Floor()
             this.roads = new Roads()
-            this.waterSurface = new WaterSurface()
             this.windLines = new WindLines()
             this.confetti = new Confetti()
-            this.leaves = new Leaves()
+            this.litter = new Litter()
             this.rain = new RainLines()
             this.lightnings = new Lightnings()
             this.fireballs = new Fireballs()
-            this.snow = new Snow()
             this.visualTornado = new VisualTornado()
             this.scrapCrates = new ScrapCrates()
             this.barricades = new Barricades()
@@ -70,6 +67,7 @@ export class World
             this.poleLights = new PoleLights()
             this.holoSigns = new HoloSigns()
             this.scenery = new Scenery()
+            this.buildings = new Buildings()
             this.areas = new Areas()
         }
         else if(step === 2)
