@@ -1,9 +1,18 @@
+import { useRef, useState } from 'react'
 import { site, socialLinks } from '../../data/site'
 import { Display, Meta } from '../typography'
 import { Container } from '../layout/Container'
+import { TerminalOverlay } from '../terminal/TerminalOverlay'
 
 export function SiteFooter() {
   const year = new Date().getFullYear()
+  const [terminalOpen, setTerminalOpen] = useState(false)
+  const terminalTriggerRef = useRef<HTMLButtonElement>(null)
+
+  function closeTerminalAndRestoreFocus() {
+    setTerminalOpen(false)
+    terminalTriggerRef.current?.focus()
+  }
 
   return (
     <footer className="border-t border-border py-section-y">
@@ -38,10 +47,21 @@ export function SiteFooter() {
           </ul>
         </div>
 
-        <Meta as="p" className="mt-16">
-          &copy; {year}
-        </Meta>
+        <div className="mt-16 flex items-center justify-between">
+          <Meta as="p">&copy; {year}</Meta>
+
+          <button
+            ref={terminalTriggerRef}
+            type="button"
+            onClick={() => setTerminalOpen(true)}
+            className="font-mono text-meta text-fg-muted transition-colors hover:text-accent"
+          >
+            &gt; wolf.dev
+          </button>
+        </div>
       </Container>
+
+      <TerminalOverlay open={terminalOpen} onClose={closeTerminalAndRestoreFocus} />
     </footer>
   )
 }
