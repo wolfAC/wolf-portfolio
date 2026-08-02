@@ -7,7 +7,9 @@ interface MoreProductsProps {
 }
 
 export function MoreProducts({ currentSlug }: MoreProductsProps) {
-  const others = projects.filter((project) => project.slug !== currentSlug)
+  const others = projects.filter(
+    (project) => project.showcase && project.slug !== currentSlug,
+  )
 
   if (others.length === 0) return null
 

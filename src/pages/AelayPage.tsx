@@ -5,15 +5,15 @@ import { ProjectMediaPlaceholder } from '../components/products/ProjectMediaPlac
 import { ProjectFlowDiagram } from '../components/products/ProjectFlowDiagram'
 import { MoreProducts } from '../components/products/MoreProducts'
 
-export function AleayPage() {
-  const project = getProjectBySlug('aleay')
+export function AelayPage() {
+  const project = getProjectBySlug('aelay')
   if (!project) return null
 
   return (
     <article className="py-section-y">
       <Container>
         <Meta as="p" className="mb-6">
-          02 / ALEAY
+          02 / AELAY
         </Meta>
 
         <Display as="h1">
@@ -79,7 +79,7 @@ export function AleayPage() {
           </>
         )}
 
-        <MoreProducts currentSlug="aleay" />
+        <MoreProducts currentSlug="aelay" />
       </Container>
     </article>
   )
