@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { productDna } from '../../data/system'
 import { getProjectBySlug } from '../../data/projects'
 import { Meta, Body } from '../typography'
+import { FadeSwap } from '../motion/FadeSwap'
 import { cn } from '../../lib/cn'
 
 export function ProductDnaGrid() {
@@ -40,38 +41,40 @@ export function ProductDnaGrid() {
       </ul>
 
       <div aria-live="polite" className="mt-8 min-h-24 border-t border-border pt-8">
-        {selected ? (
-          <>
-            <Meta as="p" className="text-fg">
-              {selected.label}
-            </Meta>
-            <Body className="mt-2 max-w-xl">{selected.description}</Body>
-
-            {selected.technologies && (
-              <ul className="mt-4 flex flex-wrap gap-2">
-                {selected.technologies.map((tech) => (
-                  <li key={tech}>
-                    <Meta as="span" className="border border-border px-3 py-1">
-                      {tech}
-                    </Meta>
-                  </li>
-                ))}
-              </ul>
-            )}
-
-            {selectedProject && (
-              <Meta
-                as={Link}
-                to={`/products/${selectedProject.slug}`}
-                className="mt-4 inline-block text-fg transition-colors hover:text-accent"
-              >
-                Used in {selectedProject.name}
+        <FadeSwap swapKey={selectedId ?? 'empty'}>
+          {selected ? (
+            <>
+              <Meta as="p" className="text-fg">
+                {selected.label}
               </Meta>
-            )}
-          </>
-        ) : (
-          <Body className="max-w-xl">Select a principle to learn more.</Body>
-        )}
+              <Body className="mt-2 max-w-xl">{selected.description}</Body>
+
+              {selected.technologies && (
+                <ul className="mt-4 flex flex-wrap gap-2">
+                  {selected.technologies.map((tech) => (
+                    <li key={tech}>
+                      <Meta as="span" className="border border-border px-3 py-1">
+                        {tech}
+                      </Meta>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {selectedProject && (
+                <Meta
+                  as={Link}
+                  to={`/products/${selectedProject.slug}`}
+                  className="mt-4 inline-block text-fg transition-colors hover:text-accent"
+                >
+                  Used in {selectedProject.name}
+                </Meta>
+              )}
+            </>
+          ) : (
+            <Body className="max-w-xl">Select a principle to learn more.</Body>
+          )}
+        </FadeSwap>
       </div>
     </div>
   )

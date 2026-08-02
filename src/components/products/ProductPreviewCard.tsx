@@ -61,10 +61,10 @@ export function ProductPreviewCard({
 
       <Link
         to={`/products/${project.slug}`}
-        className="mt-8 inline-flex items-center gap-2 text-fg transition-colors hover:text-accent"
+        className="group mt-8 inline-flex items-center gap-2 text-fg transition-colors hover:text-accent"
       >
         <Meta as="span">Explore product</Meta>
-        <ArrowIcon className="size-4" />
+        <ArrowIcon className="size-4 transition-transform group-hover:translate-x-1" />
       </Link>
     </li>
   )

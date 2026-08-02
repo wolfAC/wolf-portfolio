@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router'
 import { getLabExperimentBySlug } from '../data/lab'
 import { SectionShell } from '../components/layout/SectionShell'
 import { Display, Body, Meta } from '../components/typography'
+import { Reveal } from '../components/motion/Reveal'
 
 export function LabDetailPage() {
   const { slug } = useParams()
@@ -18,43 +19,47 @@ export function LabDetailPage() {
 
   return (
     <SectionShell index="03" title={experiment.title} eyebrowAs="p">
-      <Display as="h1">{experiment.title}</Display>
+      <Reveal>
+        <Display as="h1">{experiment.title}</Display>
 
-      <Body className="mt-6 max-w-2xl">{experiment.description}</Body>
+        <Body className="mt-6 max-w-2xl">{experiment.description}</Body>
 
-      <dl className="mt-12 grid grid-cols-2 gap-8 sm:grid-cols-3">
-        <div>
-          <Meta as="dt">Type</Meta>
-          <Body as="dd" className="mt-1 text-fg">
-            {experiment.type}
-          </Body>
-        </div>
-        <div>
-          <Meta as="dt">Date</Meta>
-          <Body as="dd" className="mt-1 text-fg">
-            {experiment.date}
-          </Body>
-        </div>
-        <div>
-          <Meta as="dt">Status</Meta>
-          <Body as="dd" className="mt-1 text-fg capitalize">
-            {experiment.status}
-          </Body>
-        </div>
-      </dl>
+        <dl className="mt-12 grid grid-cols-2 gap-8 sm:grid-cols-3">
+          <div>
+            <Meta as="dt">Type</Meta>
+            <Body as="dd" className="mt-1 text-fg">
+              {experiment.type}
+            </Body>
+          </div>
+          <div>
+            <Meta as="dt">Date</Meta>
+            <Body as="dd" className="mt-1 text-fg">
+              {experiment.date}
+            </Body>
+          </div>
+          <div>
+            <Meta as="dt">Status</Meta>
+            <Body as="dd" className="mt-1 text-fg capitalize">
+              {experiment.status}
+            </Body>
+          </div>
+        </dl>
+      </Reveal>
 
-      <Meta as="h2" className="mb-4 mt-16">
-        Stack
-      </Meta>
-      <ul className="flex flex-wrap gap-2">
-        {experiment.technologies.map((tech) => (
-          <li key={tech}>
-            <Meta as="span" className="border border-border px-3 py-1">
-              {tech}
-            </Meta>
-          </li>
-        ))}
-      </ul>
+      <Reveal>
+        <Meta as="h2" className="mb-4 mt-16">
+          Stack
+        </Meta>
+        <ul className="flex flex-wrap gap-2">
+          {experiment.technologies.map((tech) => (
+            <li key={tech}>
+              <Meta as="span" className="border border-border px-3 py-1">
+                {tech}
+              </Meta>
+            </li>
+          ))}
+        </ul>
+      </Reveal>
 
       {experiment.link && (
         <Meta

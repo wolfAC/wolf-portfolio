@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router'
 import { SiteNav } from '../components/nav/SiteNav'
 import { SiteFooter } from '../components/footer/SiteFooter'
+import { PageTransition } from '../components/motion/PageTransition'
 
 export function RootLayout() {
   return (
@@ -13,7 +14,9 @@ export function RootLayout() {
       </a>
       <SiteNav />
       <main id="main-content" className="flex-1">
-        <Outlet />
+        <PageTransition>
+          <Outlet />
+        </PageTransition>
       </main>
       <SiteFooter />
     </div>

@@ -58,10 +58,10 @@ export function LabExperimentCard({
 
       <Link
         to={`/lab/${experiment.slug}`}
-        className="mt-8 inline-flex items-center gap-2 text-fg transition-colors hover:text-accent"
+        className="group mt-8 inline-flex items-center gap-2 text-fg transition-colors hover:text-accent"
       >
         <Meta as="span">View experiment</Meta>
-        <ArrowIcon className="size-4" />
+        <ArrowIcon className="size-4 transition-transform group-hover:translate-x-1" />
       </Link>
     </li>
   )

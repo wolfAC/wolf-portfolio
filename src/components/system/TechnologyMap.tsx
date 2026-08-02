@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { projects, type Project } from '../../data/projects'
 import { Meta, Body } from '../typography'
+import { FadeSwap } from '../motion/FadeSwap'
 import { cn } from '../../lib/cn'
 
 interface TechEntry {
@@ -60,28 +61,30 @@ export function TechnologyMap() {
       </ul>
 
       <div aria-live="polite" className="mt-8 min-h-16 border-t border-border pt-8">
-        {selected ? (
-          <>
-            <Meta as="p" className="text-fg">
-              {selected.technology}
-            </Meta>
-            <ul className="mt-2 flex flex-wrap gap-4">
-              {selected.projects.map((project) => (
-                <li key={project.slug}>
-                  <Meta
-                    as={Link}
-                    to={`/products/${project.slug}`}
-                    className="text-fg transition-colors hover:text-accent"
-                  >
-                    {project.name}
-                  </Meta>
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : (
-          <Body className="max-w-xl">Select a technology to see where it&apos;s used.</Body>
-        )}
+        <FadeSwap swapKey={selectedTech ?? 'empty'}>
+          {selected ? (
+            <>
+              <Meta as="p" className="text-fg">
+                {selected.technology}
+              </Meta>
+              <ul className="mt-2 flex flex-wrap gap-4">
+                {selected.projects.map((project) => (
+                  <li key={project.slug}>
+                    <Meta
+                      as={Link}
+                      to={`/products/${project.slug}`}
+                      className="text-fg transition-colors hover:text-accent"
+                    >
+                      {project.name}
+                    </Meta>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <Body className="max-w-xl">Select a technology to see where it&apos;s used.</Body>
+          )}
+        </FadeSwap>
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { ProjectSystemNode } from '../../data/projects'
 import { Meta, Body } from '../typography'
+import { FadeSwap } from '../motion/FadeSwap'
 import { cn } from '../../lib/cn'
 
 interface CarcaranSystemMapProps {
@@ -72,18 +73,20 @@ export function CarcaranSystemMap({ systems }: CarcaranSystemMapProps) {
       </div>
 
       <div aria-live="polite" className="mt-16 min-h-24 border-t border-border pt-8">
-        {selected ? (
-          <>
-            <Meta as="p" className="text-fg">
-              {selected.label}
-            </Meta>
-            <Body className="mt-2 max-w-xl">
-              {selected.role ?? 'Detailed system breakdown — coming soon.'}
-            </Body>
-          </>
-        ) : (
-          <Body className="max-w-xl">Select a system to learn more.</Body>
-        )}
+        <FadeSwap swapKey={selectedId ?? 'empty'}>
+          {selected ? (
+            <>
+              <Meta as="p" className="text-fg">
+                {selected.label}
+              </Meta>
+              <Body className="mt-2 max-w-xl">
+                {selected.role ?? 'Detailed system breakdown — coming soon.'}
+              </Body>
+            </>
+          ) : (
+            <Body className="max-w-xl">Select a system to learn more.</Body>
+          )}
+        </FadeSwap>
       </div>
     </div>
   )

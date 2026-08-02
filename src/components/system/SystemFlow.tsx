@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { systemFlow } from '../../data/system'
 import { Meta, Body } from '../typography'
+import { FadeSwap } from '../motion/FadeSwap'
 import { cn } from '../../lib/cn'
 
 export function SystemFlow() {
@@ -33,14 +34,16 @@ export function SystemFlow() {
       </ol>
 
       <div aria-live="polite" className="mt-8 min-h-16 border-t border-border pt-8">
-        {selected && (
-          <>
-            <Meta as="p" className="text-fg">
-              {selected.label}
-            </Meta>
-            <Body className="mt-2 max-w-xl">{selected.description}</Body>
-          </>
-        )}
+        <FadeSwap swapKey={selectedId}>
+          {selected && (
+            <>
+              <Meta as="p" className="text-fg">
+                {selected.label}
+              </Meta>
+              <Body className="mt-2 max-w-xl">{selected.description}</Body>
+            </>
+          )}
+        </FadeSwap>
       </div>
     </div>
   )

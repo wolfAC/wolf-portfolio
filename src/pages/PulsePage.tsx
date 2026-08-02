@@ -5,6 +5,7 @@ import { ProjectMediaPlaceholder } from '../components/products/ProjectMediaPlac
 import { ProjectFlowDiagram } from '../components/products/ProjectFlowDiagram'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import { MoreProducts } from '../components/products/MoreProducts'
+import { Reveal } from '../components/motion/Reveal'
 
 export function PulsePage() {
   const project = getProjectBySlug('pulse')
@@ -13,75 +14,79 @@ export function PulsePage() {
   return (
     <article className="py-section-y">
       <Container>
-        <Meta as="p" className="mb-6">
-          02 / PULSE
-        </Meta>
+        <Reveal>
+          <Meta as="p" className="mb-6">
+            02 / PULSE
+          </Meta>
 
-        <Display as="h1">
-          {project.positioningLines.map((line) => (
-            <span key={line} className="block">
-              {line}
-            </span>
-          ))}
-        </Display>
+          <Display as="h1">
+            {project.positioningLines.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
+          </Display>
 
-        <Body className="mt-6 max-w-2xl">{project.summary}</Body>
+          <Body className="mt-6 max-w-2xl">{project.summary}</Body>
 
-        <ul className="mt-8 flex flex-wrap gap-2">
-          {project.modules.map((module) => (
-            <li key={module}>
-              <Meta as="span" className="border border-border px-3 py-1">
-                {module}
-              </Meta>
-            </li>
-          ))}
-        </ul>
+          <ul className="mt-8 flex flex-wrap gap-2">
+            {project.modules.map((module) => (
+              <li key={module}>
+                <Meta as="span" className="border border-border px-3 py-1">
+                  {module}
+                </Meta>
+              </li>
+            ))}
+          </ul>
 
-        <ProjectMediaPlaceholder className="mt-12" label="DASHBOARD PREVIEW" />
+          <ProjectMediaPlaceholder className="mt-12" label="DASHBOARD PREVIEW" />
+        </Reveal>
 
-        <Meta as="h2" className="mb-4 mt-16">
-          01 — Overview
-        </Meta>
-        <dl className="mb-8 grid grid-cols-2 gap-8 sm:grid-cols-3">
-          <div>
-            <Meta as="dt">Category</Meta>
-            <Body as="dd" className="mt-1 text-fg">
-              {project.category}
-            </Body>
-          </div>
-          <div>
-            <Meta as="dt">Role</Meta>
-            <Body as="dd" className="mt-1 text-fg">
-              {project.role}
-            </Body>
-          </div>
-          <div>
-            <Meta as="dt">Status</Meta>
-            <Body as="dd" className="mt-1 text-fg capitalize">
-              {project.status}
-            </Body>
-          </div>
-        </dl>
-        {project.progress != null && (
-          <div className="max-w-md">
-            <ProgressBar
-              value={project.progress}
-              label={`${project.name} build progress`}
-            />
-          </div>
-        )}
+        <Reveal>
+          <Meta as="h2" className="mb-4 mt-16">
+            01 — Overview
+          </Meta>
+          <dl className="mb-8 grid grid-cols-2 gap-8 sm:grid-cols-3">
+            <div>
+              <Meta as="dt">Category</Meta>
+              <Body as="dd" className="mt-1 text-fg">
+                {project.category}
+              </Body>
+            </div>
+            <div>
+              <Meta as="dt">Role</Meta>
+              <Body as="dd" className="mt-1 text-fg">
+                {project.role}
+              </Body>
+            </div>
+            <div>
+              <Meta as="dt">Status</Meta>
+              <Body as="dd" className="mt-1 text-fg capitalize">
+                {project.status}
+              </Body>
+            </div>
+          </dl>
+          {project.progress != null && (
+            <div className="max-w-md">
+              <ProgressBar
+                value={project.progress}
+                label={`${project.name} build progress`}
+              />
+            </div>
+          )}
+        </Reveal>
 
         {project.flow && (
-          <>
+          <Reveal>
             <Meta as="h2" className="mb-4 mt-16">
               02 — Architecture
             </Meta>
             <ProjectFlowDiagram steps={project.flow} animated />
-          </>
+          </Reveal>
         )}
 
         {project.technicalHighlights && (
-          <>
+          <Reveal>
             <Meta as="h2" className="mb-4 mt-16">
               03 — Product DNA
             </Meta>
@@ -94,16 +99,16 @@ export function PulsePage() {
                 </li>
               ))}
             </ul>
-          </>
+          </Reveal>
         )}
 
         {project.technologies.length > 0 && (
-          <>
+          <Reveal>
             <Meta as="h2" className="mb-4 mt-16">
               04 — Stack
             </Meta>
             <Body className="max-w-2xl">{project.technologies.join(' · ')}</Body>
-          </>
+          </Reveal>
         )}
 
         <MoreProducts currentSlug="pulse" />
