@@ -1,0 +1,39 @@
+import { Container } from '../components/layout/Container'
+import { Display, Meta, Body } from '../components/typography'
+import { buildLog } from '../data/build-log'
+
+function formatDate(iso: string) {
+  const [year, month, day] = iso.split('-')
+  return `${day}.${month}.${year.slice(2)}`
+}
+
+export function BuildLogPage() {
+  return (
+    <article className="py-section-y">
+      <Container>
+        <Meta as="p" className="mb-6">
+          05 / BUILD LOG
+        </Meta>
+
+        <Display as="h1">BUILD LOG</Display>
+
+        <ol className="mt-12">
+          {buildLog.map((entry, index) => (
+            <li
+              key={`${entry.date}-${index}`}
+              className="flex flex-col gap-2 border-t border-border py-6 first:border-t-0 first:pt-0 sm:flex-row sm:items-baseline sm:gap-8"
+            >
+              <Meta as="span" className="sm:w-24 sm:flex-none">
+                {formatDate(entry.date)}
+              </Meta>
+              <Meta as="span" className="text-fg sm:w-32 sm:flex-none">
+                {entry.project}
+              </Meta>
+              <Body className="sm:flex-1">{entry.description}</Body>
+            </li>
+          ))}
+        </ol>
+      </Container>
+    </article>
+  )
+}

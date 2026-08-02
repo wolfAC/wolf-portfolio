@@ -17,6 +17,7 @@ export const navItems: NavItem[] = [
   { label: 'PRODUCTS', to: '/products', homeHash: '#products' },
   { label: 'LAB', to: '/lab' },
   { label: 'SYSTEM', to: '/system' },
+  { label: 'BUILD LOG', to: '/build-log' },
   { label: 'ABOUT', to: '/about' },
   { label: 'CONTACT', to: '/contact' },
 ]

@@ -34,6 +34,9 @@ const LabIndexPage = lazy(() =>
 const LabDetailPage = lazy(() =>
   import('../pages/LabDetailPage').then((m) => ({ default: m.LabDetailPage })),
 )
+const BuildLogPage = lazy(() =>
+  import('../pages/BuildLogPage').then((m) => ({ default: m.BuildLogPage })),
+)
 const NotFoundPage = lazy(() =>
   import('../pages/stubs/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 )
@@ -51,6 +54,7 @@ export function AppRoutes() {
         <Route path="lab" element={<LabIndexPage />} />
         <Route path="lab/:slug" element={<LabDetailPage />} />
         <Route path="system" element={<SystemPage />} />
+        <Route path="build-log" element={<BuildLogPage />} />
         <Route path="about" element={<StubPage index="06" title="ABOUT" />} />
         <Route path="contact" element={<StubPage index="07" title="CONTACT" />} />
         <Route path="*" element={<NotFoundPage />} />
