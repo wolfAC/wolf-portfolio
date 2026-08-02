@@ -54,6 +54,7 @@ export const projects: Project[] = [
     flow: [
       { label: 'AUTHOR' },
       { label: 'CONTENT' },
+      { label: 'REVIEW' },
       { label: 'ADMIN' },
       { label: 'PUBLISH' },
       { label: 'USER' },

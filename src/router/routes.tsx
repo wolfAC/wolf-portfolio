@@ -16,6 +16,9 @@ const ProductDetailPage = lazy(() =>
     default: m.ProductDetailPage,
   })),
 )
+const AleayPage = lazy(() =>
+  import('../pages/AleayPage').then((m) => ({ default: m.AleayPage })),
+)
 const NotFoundPage = lazy(() =>
   import('../pages/stubs/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 )
@@ -26,6 +29,7 @@ export function AppRoutes() {
       <Route element={<RootLayout />}>
         <Route index element={<HomePage />} />
         <Route path="products" element={<ProductsIndexPage />} />
+        <Route path="products/aleay" element={<AleayPage />} />
         <Route path="products/:slug" element={<ProductDetailPage />} />
         <Route path="lab" element={<StubPage index="03" title="LAB" />} />
         <Route path="system" element={<StubPage index="04" title="SYSTEM" />} />
