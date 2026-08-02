@@ -25,6 +25,9 @@ const CarcaranPage = lazy(() =>
 const PulsePage = lazy(() =>
   import('../pages/PulsePage').then((m) => ({ default: m.PulsePage })),
 )
+const SystemPage = lazy(() =>
+  import('../pages/SystemPage').then((m) => ({ default: m.SystemPage })),
+)
 const NotFoundPage = lazy(() =>
   import('../pages/stubs/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 )
@@ -40,7 +43,7 @@ export function AppRoutes() {
         <Route path="products/pulse" element={<PulsePage />} />
         <Route path="products/:slug" element={<ProductDetailPage />} />
         <Route path="lab" element={<StubPage index="03" title="LAB" />} />
-        <Route path="system" element={<StubPage index="04" title="SYSTEM" />} />
+        <Route path="system" element={<SystemPage />} />
         <Route path="about" element={<StubPage index="06" title="ABOUT" />} />
         <Route path="contact" element={<StubPage index="07" title="CONTACT" />} />
         <Route path="*" element={<NotFoundPage />} />
