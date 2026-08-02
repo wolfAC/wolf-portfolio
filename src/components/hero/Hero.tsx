@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { motion, useTransform } from 'framer-motion'
+import { m, useTransform } from 'framer-motion'
 import { usePointer } from '../../hooks/usePointer'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { Container } from '../layout/Container'
@@ -40,23 +40,23 @@ export function Hero() {
         </Meta>
 
         <h1 className="flex flex-col">
-          <motion.span style={{ x: nameX, y: nameY }} className="text-display text-fg">
+          <m.span style={{ x: nameX, y: nameY }} className="text-display text-fg">
             {site.name}
-          </motion.span>
-          <motion.span
+          </m.span>
+          <m.span
             style={{ x: roleX, y: roleY }}
             className="text-display text-fg-muted"
           >
             {site.role}
-          </motion.span>
+          </m.span>
         </h1>
 
-        <motion.p
+        <m.p
           style={{ x: taglineX, y: taglineY }}
           className="text-section max-w-3xl text-accent"
         >
           {site.tagline}
-        </motion.p>
+        </m.p>
 
         <Body className="max-w-xl">{site.secondary}</Body>
       </Container>

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import type { ReactNode } from 'react'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 
@@ -20,7 +20,7 @@ export function FadeSwap({ swapKey, children, className }: FadeSwapProps) {
 
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <m.div
         key={swapKey}
         className={className}
         initial={{ opacity: 0, y: 4 }}
@@ -29,7 +29,7 @@ export function FadeSwap({ swapKey, children, className }: FadeSwapProps) {
         transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
       >
         {children}
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   )
 }

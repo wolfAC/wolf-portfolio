@@ -1,4 +1,4 @@
-import { motion, useTransform, type MotionValue } from 'framer-motion'
+import { m, useTransform, type MotionValue } from 'framer-motion'
 
 interface HeroCursorFieldProps {
   x: MotionValue<number>
@@ -10,7 +10,7 @@ export function HeroCursorField({ x, y }: HeroCursorFieldProps) {
   const gridY = useTransform(y, (v) => v * 10)
 
   return (
-    <motion.div
+    <m.div
       aria-hidden="true"
       style={{ x: gridX, y: gridY }}
       className="pointer-events-none absolute inset-[-5%] opacity-[0.06]"
@@ -23,6 +23,6 @@ export function HeroCursorField({ x, y }: HeroCursorFieldProps) {
           backgroundSize: '64px 64px',
         }}
       />
-    </motion.div>
+    </m.div>
   )
 }

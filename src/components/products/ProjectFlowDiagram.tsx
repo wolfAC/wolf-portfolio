@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import type { ProjectFlowStep } from '../../data/projects'
 import { Meta } from '../typography'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
@@ -38,7 +38,7 @@ export function ProjectFlowDiagram({ steps, animated = false }: ProjectFlowDiagr
         }
 
         return (
-          <motion.li
+          <m.li
             key={step.label}
             className="flex flex-col items-start gap-2"
             initial={{ opacity: 0, y: 12 }}
@@ -47,7 +47,7 @@ export function ProjectFlowDiagram({ steps, animated = false }: ProjectFlowDiagr
             transition={{ duration: 0.4, delay: index * 0.12, ease: [0.16, 1, 0.3, 1] }}
           >
             {content}
-          </motion.li>
+          </m.li>
         )
       })}
     </ol>
