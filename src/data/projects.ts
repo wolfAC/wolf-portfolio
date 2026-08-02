@@ -35,6 +35,8 @@ export interface Project {
   progress?: number
   /** Distinct, ordered subset of `modules` used in compact previews. */
   highlightModules?: string[]
+  /** Named technical differentiators, e.g. ["OFFLINE-FIRST", "MULTI-DEVICE SYNC"]. */
+  technicalHighlights?: string[]
   featured?: boolean
 }
 
@@ -122,6 +124,22 @@ export const projects: Project[] = [
       'Cypress',
       'Vercel',
       'Google Drive',
+    ],
+    flow: [
+      { label: 'UI' },
+      { label: 'APPLICATION' },
+      { label: 'LOCAL DATABASE' },
+      { label: 'INDEXEDDB' },
+      { label: 'SYNC' },
+      { label: 'CLOUD SERVICES' },
+    ],
+    technicalHighlights: [
+      'OFFLINE-FIRST',
+      'LOCAL-FIRST DATA',
+      'MULTI-DEVICE SYNC',
+      'IMPORT / EXPORT',
+      'ANALYTICS',
+      'NOTIFICATIONS',
     ],
     progress: 80,
     featured: true,

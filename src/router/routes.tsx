@@ -22,6 +22,9 @@ const AleayPage = lazy(() =>
 const CarcaranPage = lazy(() =>
   import('../pages/CarcaranPage').then((m) => ({ default: m.CarcaranPage })),
 )
+const PulsePage = lazy(() =>
+  import('../pages/PulsePage').then((m) => ({ default: m.PulsePage })),
+)
 const NotFoundPage = lazy(() =>
   import('../pages/stubs/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 )
@@ -34,6 +37,7 @@ export function AppRoutes() {
         <Route path="products" element={<ProductsIndexPage />} />
         <Route path="products/aleay" element={<AleayPage />} />
         <Route path="products/carcaran" element={<CarcaranPage />} />
+        <Route path="products/pulse" element={<PulsePage />} />
         <Route path="products/:slug" element={<ProductDetailPage />} />
         <Route path="lab" element={<StubPage index="03" title="LAB" />} />
         <Route path="system" element={<StubPage index="04" title="SYSTEM" />} />
