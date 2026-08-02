@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Internal planning docs — not part of the public portfolio
+audit/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

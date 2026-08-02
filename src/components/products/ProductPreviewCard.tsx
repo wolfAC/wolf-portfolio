@@ -6,14 +6,22 @@ import { ArrowIcon } from '../ui/icons'
 interface ProductPreviewCardProps {
   project: Project
   index: number
+  /** Heading level for the project name — 'h3' when nested under a section's
+   * own h2 (e.g. the homepage), 'h2' when used directly under a page h1
+   * (e.g. the standalone products index). Defaults to 'h3'. */
+  headingLevel?: 'h2' | 'h3'
 }
 
-export function ProductPreviewCard({ project, index }: ProductPreviewCardProps) {
+export function ProductPreviewCard({
+  project,
+  index,
+  headingLevel = 'h3',
+}: ProductPreviewCardProps) {
   return (
     <li className="border-t border-border py-12 first:border-t-0 first:pt-0">
       <Meta as="p">{String(index + 1).padStart(2, '0')}</Meta>
 
-      <SectionTitle as="h3" className="mt-4">
+      <SectionTitle as={headingLevel} className="mt-4">
         {project.name}
       </SectionTitle>
 

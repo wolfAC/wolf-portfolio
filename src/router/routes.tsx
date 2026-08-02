@@ -1,16 +1,19 @@
 import { lazy } from 'react'
-import { Routes, Route, Link } from 'react-router'
+import { Routes, Route } from 'react-router'
 import { RootLayout } from '../layouts/RootLayout'
 import { HomePage } from '../pages/HomePage'
-import { projects } from '../data/projects'
-import { Meta } from '../components/typography'
 
 const StubPage = lazy(() =>
   import('../pages/stubs/StubPage').then((m) => ({ default: m.StubPage })),
 )
-const ProductStubPage = lazy(() =>
-  import('../pages/stubs/ProductStubPage').then((m) => ({
-    default: m.ProductStubPage,
+const ProductsIndexPage = lazy(() =>
+  import('../pages/ProductsIndexPage').then((m) => ({
+    default: m.ProductsIndexPage,
+  })),
+)
+const ProductDetailPage = lazy(() =>
+  import('../pages/ProductDetailPage').then((m) => ({
+    default: m.ProductDetailPage,
   })),
 )
 const NotFoundPage = lazy(() =>
@@ -22,27 +25,8 @@ export function AppRoutes() {
     <Routes>
       <Route element={<RootLayout />}>
         <Route index element={<HomePage />} />
-        <Route
-          path="products"
-          element={
-            <StubPage index="02" title="PRODUCTS">
-              <ul className="mt-12 flex flex-col gap-4">
-                {projects.map((project) => (
-                  <li key={project.slug}>
-                    <Meta
-                      as={Link}
-                      to={`/products/${project.slug}`}
-                      className="text-fg transition-colors hover:text-accent"
-                    >
-                      {project.name} — {project.tagline}
-                    </Meta>
-                  </li>
-                ))}
-              </ul>
-            </StubPage>
-          }
-        />
-        <Route path="products/:slug" element={<ProductStubPage />} />
+        <Route path="products" element={<ProductsIndexPage />} />
+        <Route path="products/:slug" element={<ProductDetailPage />} />
         <Route path="lab" element={<StubPage index="03" title="LAB" />} />
         <Route path="system" element={<StubPage index="04" title="SYSTEM" />} />
         <Route path="about" element={<StubPage index="06" title="ABOUT" />} />

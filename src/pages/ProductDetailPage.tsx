@@ -1,0 +1,107 @@
+import { useParams } from 'react-router'
+import { getProjectBySlug } from '../data/projects'
+import { SectionShell } from '../components/layout/SectionShell'
+import { Display, Body, Meta } from '../components/typography'
+import { ProjectMediaPlaceholder } from '../components/products/ProjectMediaPlaceholder'
+import { ProjectFlowDiagram } from '../components/products/ProjectFlowDiagram'
+import { ProjectSystemsGrid } from '../components/products/ProjectSystemsGrid'
+import { ProgressBar } from '../components/ui/ProgressBar'
+import { MoreProducts } from '../components/products/MoreProducts'
+
+export function ProductDetailPage() {
+  const { slug } = useParams()
+  const project = slug ? getProjectBySlug(slug) : undefined
+
+  if (!project) {
+    return (
+      <SectionShell index="02" title="PRODUCTS" eyebrowAs="p">
+        <Display as="h1">NOT FOUND</Display>
+        <Body className="mt-6">No product matches &ldquo;{slug}&rdquo;.</Body>
+      </SectionShell>
+    )
+  }
+
+  return (
+    <SectionShell index="02" title={project.name} eyebrowAs="p">
+      <Display as="h1">
+        {project.positioningLines.map((line) => (
+          <span key={line} className="block">
+            {line}
+          </span>
+        ))}
+      </Display>
+
+      <Body className="mt-6 max-w-2xl">{project.summary}</Body>
+
+      <dl className="mt-12 grid grid-cols-2 gap-8 sm:grid-cols-3">
+        <div>
+          <Meta as="dt">Category</Meta>
+          <Body as="dd" className="mt-1 text-fg">
+            {project.category}
+          </Body>
+        </div>
+        <div>
+          <Meta as="dt">Role</Meta>
+          <Body as="dd" className="mt-1 text-fg">
+            {project.role}
+          </Body>
+        </div>
+        <div>
+          <Meta as="dt">Status</Meta>
+          <Body as="dd" className="mt-1 text-fg capitalize">
+            {project.status}
+          </Body>
+        </div>
+      </dl>
+
+      <ProjectMediaPlaceholder className="mt-12" />
+
+      {project.flow && (
+        <>
+          <Meta as="h2" className="mb-4 mt-16">
+            Flow
+          </Meta>
+          <ProjectFlowDiagram steps={project.flow} />
+        </>
+      )}
+
+      {project.systems && (
+        <>
+          <Meta as="h2" className="mb-4 mt-16">
+            Systems
+          </Meta>
+          <ProjectSystemsGrid systems={project.systems} />
+        </>
+      )}
+
+      {project.progress != null && (
+        <>
+          <Meta as="h2" className="mb-4 mt-16">
+            Build progress
+          </Meta>
+          <div className="max-w-md">
+            <ProgressBar
+              value={project.progress}
+              label={`${project.name} build progress`}
+            />
+          </div>
+        </>
+      )}
+
+      {project.technologies.length > 0 && (
+        <>
+          <Meta as="h2" className="mb-4 mt-16">
+            Stack
+          </Meta>
+          <Body className="max-w-2xl">{project.technologies.join(' · ')}</Body>
+        </>
+      )}
+
+      <Meta as="p" className="mt-16">
+        Full case study — coming soon.
+      </Meta>
+
+      <MoreProducts currentSlug={project.slug} />
+    </SectionShell>
+  )
+}
