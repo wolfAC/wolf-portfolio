@@ -1,12 +1,13 @@
 import { SectionShell } from '../components/layout/SectionShell'
-import { Display } from '../components/typography'
+import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { ProductPreviewCard } from '../components/products/ProductPreviewCard'
+import { ProductsScrollSpy } from '../components/products/ProductsScrollSpy'
 import { projects } from '../data/projects'
 
 export function ProductsIndexPage() {
   return (
     <SectionShell index="02" title="PRODUCTS" eyebrowAs="p">
-      <Display as="h1">PRODUCTS</Display>
+      <AnimatedHeading lines={['PRODUCTS']} />
 
       <ul className="mt-12">
         {projects.map((project, index) => (
@@ -18,6 +19,8 @@ export function ProductsIndexPage() {
           />
         ))}
       </ul>
+
+      <ProductsScrollSpy projects={projects} />
     </SectionShell>
   )
 }

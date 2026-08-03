@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { SectionShell } from '../../components/layout/SectionShell'
-import { Display, Body } from '../../components/typography'
+import { Body } from '../../components/typography'
+import { AnimatedHeading } from '../../components/motion/AnimatedHeading'
 
 interface StubPageProps {
   index: string
@@ -12,7 +13,7 @@ interface StubPageProps {
 export function StubPage({ index, title, note, children }: StubPageProps) {
   return (
     <SectionShell index={index} title={title} eyebrowAs="p" className="min-h-[60vh]">
-      <Display as="h1">{title}</Display>
+      <AnimatedHeading lines={[title]} />
       <Body className="mt-6 max-w-xl">
         {note ?? 'This section is being built. Check back soon.'}
       </Body>

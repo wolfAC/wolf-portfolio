@@ -1,7 +1,8 @@
 import { useParams, Link } from 'react-router'
 import { getLabExperimentBySlug } from '../data/lab'
 import { SectionShell } from '../components/layout/SectionShell'
-import { Display, Body, Meta } from '../components/typography'
+import { Body, Meta } from '../components/typography'
+import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { Reveal } from '../components/motion/Reveal'
 
 export function LabDetailPage() {
@@ -11,7 +12,7 @@ export function LabDetailPage() {
   if (!experiment) {
     return (
       <SectionShell index="03" title="LAB" eyebrowAs="p">
-        <Display as="h1">NOT FOUND</Display>
+        <AnimatedHeading lines={['NOT FOUND']} />
         <Body className="mt-6">No experiment matches &ldquo;{slug}&rdquo;.</Body>
       </SectionShell>
     )
@@ -20,7 +21,7 @@ export function LabDetailPage() {
   return (
     <SectionShell index="03" title={experiment.title} eyebrowAs="p">
       <Reveal>
-        <Display as="h1">{experiment.title}</Display>
+        <AnimatedHeading lines={[experiment.title]} />
 
         <Body className="mt-6 max-w-2xl">{experiment.description}</Body>
 

@@ -104,7 +104,7 @@ export function TerminalOverlay({ open, onClose }: TerminalOverlayProps) {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-gutter py-6">
+      <div data-lenis-prevent className="flex-1 overflow-y-auto px-gutter py-6">
         <p className="text-meta text-fg-muted">
           Type &apos;help&apos; to see available commands.
         </p>

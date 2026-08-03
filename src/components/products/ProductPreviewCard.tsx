@@ -18,7 +18,10 @@ export function ProductPreviewCard({
   headingLevel = 'h3',
 }: ProductPreviewCardProps) {
   return (
-    <li className="border-t border-border py-12 first:border-t-0 first:pt-0">
+    <li
+      id={`project-${project.slug}`}
+      className="scroll-mt-24 border-t border-border py-12 first:border-t-0 first:pt-0"
+    >
       <Meta as="p">{String(index + 1).padStart(2, '0')}</Meta>
 
       <SectionTitle as={headingLevel} className="mt-4">

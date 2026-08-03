@@ -3,11 +3,19 @@ import { m, useTransform, type MotionValue } from 'framer-motion'
 interface HeroCursorFieldProps {
   x: MotionValue<number>
   y: MotionValue<number>
+  /** Scroll-linked drift, added on top of the cursor-driven offset — grows
+   * as the user scrolls past the Hero, so the grid keeps drifting rather
+   * than only reacting to the (now-departed) pointer. */
+  scrollDrift: MotionValue<number>
 }
 
-export function HeroCursorField({ x, y }: HeroCursorFieldProps) {
+export function HeroCursorField({ x, y, scrollDrift }: HeroCursorFieldProps) {
   const gridX = useTransform(x, (v) => v * 10)
-  const gridY = useTransform(y, (v) => v * 10)
+  const cursorGridY = useTransform(y, (v) => v * 10)
+  const gridY = useTransform<number, number>(
+    [cursorGridY, scrollDrift],
+    ([cursor, scroll]) => cursor + scroll,
+  )
 
   return (
     <m.div

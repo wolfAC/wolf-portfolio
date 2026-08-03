@@ -1,6 +1,7 @@
 import { getProjectBySlug } from '../data/projects'
 import { Container } from '../components/layout/Container'
-import { Display, Body, Meta } from '../components/typography'
+import { Body, Meta } from '../components/typography'
+import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { ProjectMediaPlaceholder } from '../components/products/ProjectMediaPlaceholder'
 import { ProjectFlowDiagram } from '../components/products/ProjectFlowDiagram'
 import { ProgressBar } from '../components/ui/ProgressBar'
@@ -19,13 +20,7 @@ export function PulsePage() {
             02 / PULSE
           </Meta>
 
-          <Display as="h1">
-            {project.positioningLines.map((line) => (
-              <span key={line} className="block">
-                {line}
-              </span>
-            ))}
-          </Display>
+          <AnimatedHeading lines={project.positioningLines} />
 
           <Body className="mt-6 max-w-2xl">{project.summary}</Body>
 

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { m, useTransform } from 'framer-motion'
+import { m, useScroll, useTransform } from 'framer-motion'
 import { usePointer } from '../../hooks/usePointer'
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { Container } from '../layout/Container'
@@ -18,6 +18,12 @@ export function Hero() {
 
   const { x, y } = usePointer(sectionRef, { enabled: interactive })
 
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  })
+  const scrollDrift = useTransform(scrollYProgress, [0, 1], [0, 80])
+
   const nameX = useTransform(x, (v) => v * 6)
   const nameY = useTransform(y, (v) => v * 4)
   const roleX = useTransform(x, (v) => v * -10)
@@ -32,7 +38,7 @@ export function Hero() {
       ref={sectionRef}
       className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden"
     >
-      {interactive && <HeroCursorField x={x} y={y} />}
+      {interactive && <HeroCursorField x={x} y={y} scrollDrift={scrollDrift} />}
 
       <Container className="flex flex-1 flex-col justify-center gap-8 py-section-y">
         <Meta as="p">

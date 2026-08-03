@@ -34,6 +34,7 @@ export function QuickViewOverlay({ open, onClose }: QuickViewOverlayProps) {
       role="dialog"
       aria-modal="true"
       aria-label="Quick view"
+      data-lenis-prevent
       className="fixed inset-0 z-50 overflow-y-auto bg-bg"
     >
       <Container className="flex min-h-full flex-col py-12">

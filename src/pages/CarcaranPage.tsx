@@ -1,6 +1,7 @@
 import { getProjectBySlug } from '../data/projects'
 import { Container } from '../components/layout/Container'
-import { Display, Body, Meta } from '../components/typography'
+import { Body, Meta } from '../components/typography'
+import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { CarcaranSystemMap } from '../components/products/CarcaranSystemMap'
 import { MoreProducts } from '../components/products/MoreProducts'
 import { Reveal } from '../components/motion/Reveal'
@@ -17,13 +18,7 @@ export function CarcaranPage() {
             02 / CARCARAN
           </Meta>
 
-          <Display as="h1">
-            {project.positioningLines.map((line) => (
-              <span key={line} className="block">
-                {line}
-              </span>
-            ))}
-          </Display>
+          <AnimatedHeading lines={project.positioningLines} />
 
           <Body className="mt-6 max-w-2xl">{project.summary}</Body>
 

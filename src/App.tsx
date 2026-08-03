@@ -1,19 +1,24 @@
 import { Suspense } from 'react'
 import { BrowserRouter } from 'react-router'
 import { LazyMotion } from 'framer-motion'
+import { ReactLenis } from 'lenis/react'
 import { AppRoutes } from './router/routes'
+import { SplashScreen } from './components/splash/SplashScreen'
 
 const loadFeatures = () => import('framer-motion').then((res) => res.domAnimation)
 
 function App() {
   return (
-    <BrowserRouter>
+    <ReactLenis root options={{ anchors: true }}>
       <LazyMotion features={loadFeatures} strict>
-        <Suspense fallback={null}>
-          <AppRoutes />
-        </Suspense>
+        <SplashScreen />
+        <BrowserRouter>
+          <Suspense fallback={null}>
+            <AppRoutes />
+          </Suspense>
+        </BrowserRouter>
       </LazyMotion>
-    </BrowserRouter>
+    </ReactLenis>
   )
 }
 

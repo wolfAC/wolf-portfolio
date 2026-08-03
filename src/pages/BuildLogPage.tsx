@@ -1,5 +1,6 @@
 import { Container } from '../components/layout/Container'
-import { Display, Meta, Body } from '../components/typography'
+import { Meta, Body } from '../components/typography'
+import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { buildLog } from '../data/build-log'
 import { Reveal } from '../components/motion/Reveal'
 
@@ -17,7 +18,7 @@ export function BuildLogPage() {
             05 / BUILD LOG
           </Meta>
 
-          <Display as="h1">BUILD LOG</Display>
+          <AnimatedHeading lines={['BUILD LOG']} />
 
           <ol className="mt-12">
             {buildLog.map((entry, index) => (

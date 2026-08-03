@@ -1,5 +1,6 @@
 import { Container } from '../components/layout/Container'
-import { Display, Body, Meta } from '../components/typography'
+import { Body, Meta } from '../components/typography'
+import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { SystemFlow } from '../components/system/SystemFlow'
 import { ProductDnaGrid } from '../components/system/ProductDnaGrid'
 import { TechnologyMap } from '../components/system/TechnologyMap'
@@ -14,7 +15,7 @@ export function SystemPage() {
             04 / SYSTEM
           </Meta>
 
-          <Display as="h1">MY SYSTEM</Display>
+          <AnimatedHeading lines={['MY SYSTEM']} />
 
           <Body className="mt-6 max-w-2xl">
             Every product goes through the same process, from problem to shipped

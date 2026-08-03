@@ -1,7 +1,8 @@
 import { useParams } from 'react-router'
 import { getProjectBySlug } from '../data/projects'
 import { SectionShell } from '../components/layout/SectionShell'
-import { Display, Body, Meta } from '../components/typography'
+import { Body, Meta } from '../components/typography'
+import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { ProjectMediaPlaceholder } from '../components/products/ProjectMediaPlaceholder'
 import { ProjectFlowDiagram } from '../components/products/ProjectFlowDiagram'
 import { ProjectSystemsGrid } from '../components/products/ProjectSystemsGrid'
@@ -16,7 +17,7 @@ export function ProductDetailPage() {
   if (!project) {
     return (
       <SectionShell index="02" title="PRODUCTS" eyebrowAs="p">
-        <Display as="h1">NOT FOUND</Display>
+        <AnimatedHeading lines={['NOT FOUND']} />
         <Body className="mt-6">No product matches &ldquo;{slug}&rdquo;.</Body>
       </SectionShell>
     )
@@ -25,13 +26,7 @@ export function ProductDetailPage() {
   return (
     <SectionShell index="02" title={project.name} eyebrowAs="p">
       <Reveal>
-        <Display as="h1">
-          {project.positioningLines.map((line) => (
-            <span key={line} className="block">
-              {line}
-            </span>
-          ))}
-        </Display>
+        <AnimatedHeading lines={project.positioningLines} />
 
         <Body className="mt-6 max-w-2xl">{project.summary}</Body>
 
