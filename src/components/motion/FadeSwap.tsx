@@ -1,6 +1,5 @@
 import { AnimatePresence, m } from 'framer-motion'
 import type { ReactNode } from 'react'
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 
 interface FadeSwapProps {
   /** Changing this key cross-fades out the old content and in the new. */
@@ -12,12 +11,6 @@ interface FadeSwapProps {
 /** Small cross-fade for detail-panel content that changes on selection
  * (system maps, tech maps, etc.) instead of swapping instantly. */
 export function FadeSwap({ swapKey, children, className }: FadeSwapProps) {
-  const reducedMotion = usePrefersReducedMotion()
-
-  if (reducedMotion) {
-    return <div className={className}>{children}</div>
-  }
-
   return (
     <AnimatePresence mode="wait">
       <m.div

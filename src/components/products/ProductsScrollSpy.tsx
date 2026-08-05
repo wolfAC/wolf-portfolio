@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useLenis } from 'lenis/react'
 import type { Project } from '../../data/projects'
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { cn } from '../../lib/cn'
 
 interface ProductsScrollSpyProps {
@@ -11,7 +10,6 @@ interface ProductsScrollSpyProps {
 /** Slim vertical marker rail next to the scrollbar — one dot per project,
  * highlighting whichever card is currently in view; click jumps to it. */
 export function ProductsScrollSpy({ projects }: ProductsScrollSpyProps) {
-  const reducedMotion = usePrefersReducedMotion()
   const lenis = useLenis()
   const [activeSlug, setActiveSlug] = useState(projects[0]?.slug)
 
@@ -46,7 +44,7 @@ export function ProductsScrollSpy({ projects }: ProductsScrollSpyProps) {
     if (lenis) {
       lenis.scrollTo(element)
     } else {
-      element.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth' })
+      element.scrollIntoView({ behavior: 'smooth' })
     }
   }
 

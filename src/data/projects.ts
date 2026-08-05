@@ -52,7 +52,7 @@ export const projects: Project[] = [
     tagline: 'PUBLISHING PLATFORM',
     summary:
       'A hybrid mobile app where authors upload books and track real-time publishing status, while readers order physical copies. Authors earn royalties based on popularity, managed through an admin dashboard for books, users, and royalty payouts.',
-    category: 'Client Product',
+    category: 'Independent Product',
     role: 'Product Engineer',
     status: 'completed',
     modules: ['APP', 'ADMIN', 'CONTENT', 'WORKFLOW'],
@@ -75,16 +75,28 @@ export const projects: Project[] = [
     tagline: 'ONE PRODUCT. FOUR SYSTEMS.',
     summary:
       'A multi-system automotive platform with dedicated user, dealer, admin and DRM workflows.',
-    category: 'Client Product',
+    category: 'Independent Product',
     role: 'Product Engineer',
     status: 'completed',
     modules: ['USER', 'ADMIN', 'DRM', 'DEALER'],
     technologies: [],
     systems: [
-      { id: 'user', label: 'USER' },
-      { id: 'admin', label: 'ADMIN' },
-      { id: 'drm', label: 'DRM' },
-      { id: 'dealer', label: 'DEALER' },
+      {
+        id: 'user',
+        label: 'USER',
+        role: "Buy and sell cars, whether through dealerships or individual sellers.",
+      },
+      {
+        id: 'admin',
+        label: 'ADMIN',
+        role: 'Add, delete, and update user profiles, vehicle listings, and dealer information.',
+      },
+      { id: 'drm', label: 'DRM', role: 'Manage dealerships.' },
+      {
+        id: 'dealer',
+        label: 'DEALER',
+        role: "Add, delete, and update inventory within a dealership.",
+      },
     ],
     links: [],
     showcase: true,
@@ -158,7 +170,7 @@ export const projects: Project[] = [
     positioningLines: ['DIGITAL HEALTH', 'DOCUMENTS'],
     tagline: 'DIGITAL HEALTH DOCUMENT PLATFORM',
     summary:
-      'A digital health document management platform integrating India’s ABHA health-ID standard, with dedicated apps for doctors, clinics, and patients.',
+      'A digital health document management platform integrating India’s ABHA health-ID standard, with dedicated apps for doctors, clinics, and patients, plus a Next.js marketing site built for SEO.',
     category: 'Client Product',
     role: 'Product Engineer',
     status: 'live',

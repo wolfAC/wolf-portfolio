@@ -1,20 +1,19 @@
 import { useRef, useState } from 'react'
 import { m, useScroll, useTransform } from 'framer-motion'
 import { usePointer } from '../../hooks/usePointer'
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 import { Container } from '../layout/Container'
 import { Body, Meta } from '../typography'
 import { HeroCursorField } from './HeroCursorField'
+import { ScrambleName } from './ScrambleName'
 import { ScrollCue } from './ScrollCue'
 import { site } from '../../data/site'
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
-  const reducedMotion = usePrefersReducedMotion()
   const [pointerFine] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches,
   )
-  const interactive = !reducedMotion && pointerFine
+  const interactive = pointerFine
 
   const { x, y } = usePointer(sectionRef, { enabled: interactive })
 
@@ -47,7 +46,7 @@ export function Hero() {
 
         <h1 className="flex flex-col">
           <m.span style={{ x: nameX, y: nameY }} className="text-display text-fg">
-            {site.name}
+            <ScrambleName defaultText={site.realName} hoverText={site.name} />
           </m.span>
           <m.span
             style={{ x: roleX, y: roleY }}

@@ -1,21 +1,13 @@
 import { m } from 'framer-motion'
 import type { ReactNode } from 'react'
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 
 interface RevealProps {
   children: ReactNode
   className?: string
 }
 
-/** One-shot scroll-into-view reveal; renders the final state immediately when
- * the user prefers reduced motion, rather than just shortening the animation. */
+/** One-shot scroll-into-view reveal. */
 export function Reveal({ children, className }: RevealProps) {
-  const reducedMotion = usePrefersReducedMotion()
-
-  if (reducedMotion) {
-    return <div className={className}>{children}</div>
-  }
-
   return (
     <m.div
       className={className}

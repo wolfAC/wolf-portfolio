@@ -1,7 +1,6 @@
 import { m } from 'framer-motion'
 import type { ReactNode } from 'react'
 import { useLocation } from 'react-router'
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 
 interface PageTransitionProps {
   children: ReactNode
@@ -12,11 +11,6 @@ interface PageTransitionProps {
  * worth the complexity. */
 export function PageTransition({ children }: PageTransitionProps) {
   const { pathname } = useLocation()
-  const reducedMotion = usePrefersReducedMotion()
-
-  if (reducedMotion) {
-    return <div>{children}</div>
-  }
 
   return (
     <m.div

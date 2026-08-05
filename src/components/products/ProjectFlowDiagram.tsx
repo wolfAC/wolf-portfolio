@@ -1,7 +1,6 @@
 import { m } from 'framer-motion'
 import type { ProjectFlowStep } from '../../data/projects'
 import { Meta } from '../typography'
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion'
 
 interface ProjectFlowDiagramProps {
   steps: ProjectFlowStep[]
@@ -10,9 +9,6 @@ interface ProjectFlowDiagramProps {
 }
 
 export function ProjectFlowDiagram({ steps, animated = false }: ProjectFlowDiagramProps) {
-  const reducedMotion = usePrefersReducedMotion()
-  const shouldAnimate = animated && !reducedMotion
-
   return (
     <ol className="flex flex-col items-start gap-2">
       {steps.map((step, index) => {
@@ -29,7 +25,7 @@ export function ProjectFlowDiagram({ steps, animated = false }: ProjectFlowDiagr
           </>
         )
 
-        if (!shouldAnimate) {
+        if (!animated) {
           return (
             <li key={step.label} className="flex flex-col items-start gap-2">
               {content}
