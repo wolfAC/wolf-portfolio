@@ -65,7 +65,11 @@ export function ScrambleName({ defaultText, hoverText, className }: ScrambleName
     <span
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
-      className={cn('relative inline-block', className)}
+      className={cn('relative inline-block whitespace-nowrap', className)}
+      // Shrinks below the ambient text-display size on narrow viewports so the
+      // longer of the two strings never wraps to a second line — capped at
+      // text-display's own value so it's never larger than the role line below it.
+      style={{ fontSize: 'min(var(--text-display), clamp(1.5rem, 8vw, 9rem))' }}
     >
       <span aria-hidden="true" className="invisible">
         {sizerText}
