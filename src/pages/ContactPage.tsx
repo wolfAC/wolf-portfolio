@@ -3,6 +3,7 @@ import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { Body, Meta, SectionTitle } from '../components/typography'
 import { Reveal } from '../components/motion/Reveal'
 import { ArrowIcon } from '../components/ui/icons'
+import { ContactForm } from '../components/contact/ContactForm'
 import { site, socialLinks } from '../data/site'
 
 const emailLink = socialLinks.find((link) => link.label === 'EMAIL')
@@ -34,7 +35,12 @@ export function ContactPage() {
           </a>
         )}
 
-        <ul className="mt-12 flex flex-wrap gap-x-10 gap-y-4 border-t border-border pt-8">
+        <Meta as="p" className="mb-4 mt-16">
+          Or send a message directly
+        </Meta>
+        <ContactForm />
+
+        <ul className="mt-16 flex flex-wrap gap-x-10 gap-y-4 border-t border-border pt-8">
           {otherLinks.map((link) => (
             <li key={link.label}>
               <a

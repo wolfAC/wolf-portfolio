@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { m, useScroll, useTransform } from 'framer-motion'
 import { usePointer } from '../../hooks/usePointer'
+import { useLowPowerDevice } from '../../hooks/useLowPowerDevice'
 import { Container } from '../layout/Container'
 import { Body, Meta } from '../typography'
 import { HeroCursorField } from './HeroCursorField'
@@ -13,7 +14,12 @@ export function Hero() {
   const [pointerFine] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches,
   )
-  const interactive = pointerFine
+  const lowPowerDevice = useLowPowerDevice()
+  // Pointer-driven parallax chains 9 motion values per frame (name/role/
+  // tagline drift + the background grid) — profiled at ~80ms/frame under a
+  // throttled CPU, by far the heaviest thing on this page. Skip it on
+  // hardware that can't afford it; the hero still works fine static.
+  const interactive = pointerFine && !lowPowerDevice
 
   const { x, y } = usePointer(sectionRef, { enabled: interactive })
 

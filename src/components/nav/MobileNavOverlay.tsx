@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { NavLink } from 'react-router'
 import { navItems } from '../../data/site'
 import { CloseIcon } from '../ui/icons'
+import { useScrollToTop } from '../../hooks/useScrollToTop'
 
 interface MobileNavOverlayProps {
   open: boolean
@@ -12,6 +13,7 @@ interface MobileNavOverlayProps {
 
 export function MobileNavOverlay({ open, onClose, isHome }: MobileNavOverlayProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const scrollToTop = useScrollToTop()
 
   useEffect(() => {
     if (!open) return
@@ -60,7 +62,10 @@ export function MobileNavOverlay({ open, onClose, isHome }: MobileNavOverlayProp
               ) : (
                 <NavLink
                   to={item.homeHash ? `/${item.homeHash}` : item.to}
-                  onClick={onClose}
+                  onClick={() => {
+                    onClose()
+                    if (!item.homeHash) scrollToTop()
+                  }}
                   className="text-section text-fg"
                 >
                   {item.label}

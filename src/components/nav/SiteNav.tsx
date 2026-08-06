@@ -6,6 +6,7 @@ import { Container } from '../layout/Container'
 import { MenuIcon } from '../ui/icons'
 import { MobileNavOverlay } from './MobileNavOverlay'
 import { QuickViewOverlay } from '../quick-view/QuickViewOverlay'
+import { useScrollToTop } from '../../hooks/useScrollToTop'
 import { cn } from '../../lib/cn'
 
 export function SiteNav() {
@@ -15,6 +16,7 @@ export function SiteNav() {
   const isHome = location.pathname === '/'
   const triggerRef = useRef<HTMLButtonElement>(null)
   const quickViewTriggerRef = useRef<HTMLButtonElement>(null)
+  const scrollToTop = useScrollToTop()
 
   function closeAndRestoreFocus() {
     setOpen(false)
@@ -29,7 +31,7 @@ export function SiteNav() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-4 md:h-20">
-        <Meta as={Link} to="/" className="text-fg">
+        <Meta as={Link} to="/" onClick={scrollToTop} className="text-fg">
           {site.name}
         </Meta>
 
@@ -42,7 +44,10 @@ export function SiteNav() {
                     <Meta as="span">{item.label}</Meta>
                   </a>
                 ) : (
-                  <NavLink to={item.homeHash ? `/${item.homeHash}` : item.to}>
+                  <NavLink
+                    to={item.homeHash ? `/${item.homeHash}` : item.to}
+                    onClick={item.homeHash ? undefined : scrollToTop}
+                  >
                     {({ isActive }) => (
                       <Meta
                         as="span"

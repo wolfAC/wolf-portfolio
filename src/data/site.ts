@@ -4,6 +4,7 @@ export const site = {
   role: 'PRODUCT ENGINEER',
   tagline: 'I BUILD PRODUCTS, NOT JUST WEBSITES.',
   secondary: 'I design and build digital products from idea to production.',
+  email: 'anbu8132609@gmail.com',
   statusLabel: 'AVAILABLE FOR SELECT PROJECTS',
   experienceSummary:
     'Nearly 5 years building production software — healthcare platforms, civic-tech tools, and independent products.',
@@ -34,5 +35,5 @@ export interface SocialLink {
 export const socialLinks: SocialLink[] = [
   { label: 'GITHUB', href: 'https://github.com/wolfAC' },
   { label: 'LINKEDIN', href: 'https://www.linkedin.com/in/anbu-chezhiyan' },
-  { label: 'EMAIL', href: 'mailto:tharun@byepo.in' },
+  { label: 'EMAIL', href: `mailto:${site.email}` },
 ]
