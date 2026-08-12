@@ -3,6 +3,7 @@ import { Container } from '../components/layout/Container'
 import { Body, Meta } from '../components/typography'
 import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { CarcaranSystemMap } from '../components/products/CarcaranSystemMap'
+import { ProjectPreviewGallery } from '../components/products/ProjectPreviewGallery'
 import { MoreProducts } from '../components/products/MoreProducts'
 import { Reveal } from '../components/motion/Reveal'
 
@@ -35,7 +36,14 @@ export function CarcaranPage() {
 
         <Reveal>
           <Meta as="h2" className="mb-4 mt-16">
-            01 — System Map
+            01 — Preview
+          </Meta>
+          <ProjectPreviewGallery modules={project.modules} />
+        </Reveal>
+
+        <Reveal>
+          <Meta as="h2" className="mb-4 mt-16">
+            02 — System Map
           </Meta>
 
           <dl className="mb-12 grid grid-cols-2 gap-8 sm:grid-cols-3">

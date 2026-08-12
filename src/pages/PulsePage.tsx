@@ -2,7 +2,7 @@ import { getProjectBySlug } from '../data/projects'
 import { Container } from '../components/layout/Container'
 import { Body, Meta } from '../components/typography'
 import { AnimatedHeading } from '../components/motion/AnimatedHeading'
-import { ProjectMediaPlaceholder } from '../components/products/ProjectMediaPlaceholder'
+import { ProjectPreviewGallery } from '../components/products/ProjectPreviewGallery'
 import { ProjectFlowDiagram } from '../components/products/ProjectFlowDiagram'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import { MoreProducts } from '../components/products/MoreProducts'
@@ -33,13 +33,18 @@ export function PulsePage() {
               </li>
             ))}
           </ul>
-
-          <ProjectMediaPlaceholder className="mt-12" label="DASHBOARD PREVIEW" />
         </Reveal>
 
         <Reveal>
           <Meta as="h2" className="mb-4 mt-16">
-            01 — Overview
+            01 — Preview
+          </Meta>
+          <ProjectPreviewGallery modules={project.highlightModules ?? project.modules} />
+        </Reveal>
+
+        <Reveal>
+          <Meta as="h2" className="mb-4 mt-16">
+            02 — Overview
           </Meta>
           <dl className="mb-8 grid grid-cols-2 gap-8 sm:grid-cols-3">
             <div>
@@ -74,7 +79,7 @@ export function PulsePage() {
         {project.flow && (
           <Reveal>
             <Meta as="h2" className="mb-4 mt-16">
-              02 — Architecture
+              03 — Architecture
             </Meta>
             <ProjectFlowDiagram steps={project.flow} animated />
           </Reveal>
@@ -83,7 +88,7 @@ export function PulsePage() {
         {project.technicalHighlights && (
           <Reveal>
             <Meta as="h2" className="mb-4 mt-16">
-              03 — Product DNA
+              04 — Product DNA
             </Meta>
             <ul className="flex flex-wrap gap-2">
               {project.technicalHighlights.map((highlight) => (
@@ -100,7 +105,7 @@ export function PulsePage() {
         {project.technologies.length > 0 && (
           <Reveal>
             <Meta as="h2" className="mb-4 mt-16">
-              04 — Stack
+              05 — Stack
             </Meta>
             <Body className="max-w-2xl">{project.technologies.join(' · ')}</Body>
           </Reveal>

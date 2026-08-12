@@ -3,7 +3,7 @@ import { getProjectBySlug } from '../data/projects'
 import { SectionShell } from '../components/layout/SectionShell'
 import { Body, Meta } from '../components/typography'
 import { AnimatedHeading } from '../components/motion/AnimatedHeading'
-import { ProjectMediaPlaceholder } from '../components/products/ProjectMediaPlaceholder'
+import { ProjectPreviewGallery } from '../components/products/ProjectPreviewGallery'
 import { ProjectFlowDiagram } from '../components/products/ProjectFlowDiagram'
 import { ProjectSystemsGrid } from '../components/products/ProjectSystemsGrid'
 import { ProgressBar } from '../components/ui/ProgressBar'
@@ -50,9 +50,16 @@ export function ProductDetailPage() {
             </Body>
           </div>
         </dl>
-
-        <ProjectMediaPlaceholder className="mt-12" />
       </Reveal>
+
+      {project.modules.length > 0 && (
+        <Reveal>
+          <Meta as="h2" className="mb-4 mt-16">
+            Preview
+          </Meta>
+          <ProjectPreviewGallery modules={project.modules} />
+        </Reveal>
+      )}
 
       {project.flow && (
         <Reveal>

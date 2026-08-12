@@ -2,7 +2,7 @@ import { getProjectBySlug } from '../data/projects'
 import { Container } from '../components/layout/Container'
 import { Body, Meta } from '../components/typography'
 import { AnimatedHeading } from '../components/motion/AnimatedHeading'
-import { ProjectMediaPlaceholder } from '../components/products/ProjectMediaPlaceholder'
+import { ProjectPreviewGallery } from '../components/products/ProjectPreviewGallery'
 import { ProjectFlowDiagram } from '../components/products/ProjectFlowDiagram'
 import { MoreProducts } from '../components/products/MoreProducts'
 import { Reveal } from '../components/motion/Reveal'
@@ -62,22 +62,15 @@ export function AelayPage() {
 
         <Reveal>
           <Meta as="h2" className="mb-4 mt-16">
-            02 — User Experience
+            02 — Preview
           </Meta>
-          <ProjectMediaPlaceholder label="APP PREVIEW" />
-        </Reveal>
-
-        <Reveal>
-          <Meta as="h2" className="mb-4 mt-16">
-            03 — Admin System
-          </Meta>
-          <ProjectMediaPlaceholder label="ADMIN PREVIEW" />
+          <ProjectPreviewGallery modules={project.modules} />
         </Reveal>
 
         {project.flow && (
           <Reveal>
             <Meta as="h2" className="mb-4 mt-16">
-              04 — Content Flow
+              03 — Content Flow
             </Meta>
             <ProjectFlowDiagram steps={project.flow} animated />
           </Reveal>
