@@ -7,10 +7,16 @@ import { ProjectFlowDiagram } from '../components/products/ProjectFlowDiagram'
 import { ProgressBar } from '../components/ui/ProgressBar'
 import { MoreProducts } from '../components/products/MoreProducts'
 import { Reveal } from '../components/motion/Reveal'
+import { SystemHub } from '../components/products/SystemHub'
 
 export function PulsePage() {
   const project = getProjectBySlug('pulse')
   if (!project) return null
+
+  const hubNodes = (project.highlightModules ?? project.modules).map((module) => ({
+    id: module,
+    label: module,
+  }))
 
   return (
     <article className="py-section-y">
@@ -24,29 +30,41 @@ export function PulsePage() {
 
           <Body className="mt-6 max-w-2xl">{project.summary}</Body>
 
-          <ul className="mt-8 flex flex-wrap gap-2">
-            {project.modules.map((module) => (
-              <li key={module}>
-                <Meta as="span" className="border border-border px-3 py-1">
-                  {module}
+          {project.progress != null && (
+            <div className="mt-8 max-w-md">
+              <div className="mb-2 flex items-baseline justify-between">
+                <Meta as="span">Build progress</Meta>
+                <Meta as="span" className="text-fg">
+                  {project.progress}%
                 </Meta>
-              </li>
-            ))}
-          </ul>
+              </div>
+              <ProgressBar
+                value={project.progress}
+                label={`${project.name} build progress`}
+              />
+            </div>
+          )}
+        </Reveal>
+
+        <Reveal>
+          <Meta as="h2" className="mb-8 mt-16">
+            01 — System
+          </Meta>
+          <SystemHub nodes={hubNodes} centerLabel={project.name} />
         </Reveal>
 
         <Reveal>
           <Meta as="h2" className="mb-4 mt-16">
-            01 — Preview
+            02 — Preview
           </Meta>
           <ProjectPreviewGallery modules={project.highlightModules ?? project.modules} />
         </Reveal>
 
         <Reveal>
           <Meta as="h2" className="mb-4 mt-16">
-            02 — Overview
+            03 — Overview
           </Meta>
-          <dl className="mb-8 grid grid-cols-2 gap-8 sm:grid-cols-3">
+          <dl className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             <div>
               <Meta as="dt">Category</Meta>
               <Body as="dd" className="mt-1 text-fg">
@@ -66,20 +84,12 @@ export function PulsePage() {
               </Body>
             </div>
           </dl>
-          {project.progress != null && (
-            <div className="max-w-md">
-              <ProgressBar
-                value={project.progress}
-                label={`${project.name} build progress`}
-              />
-            </div>
-          )}
         </Reveal>
 
         {project.flow && (
           <Reveal>
             <Meta as="h2" className="mb-4 mt-16">
-              03 — Architecture
+              04 — Architecture
             </Meta>
             <ProjectFlowDiagram steps={project.flow} animated />
           </Reveal>
@@ -88,7 +98,7 @@ export function PulsePage() {
         {project.technicalHighlights && (
           <Reveal>
             <Meta as="h2" className="mb-4 mt-16">
-              04 — Product DNA
+              05 — Product DNA
             </Meta>
             <ul className="flex flex-wrap gap-2">
               {project.technicalHighlights.map((highlight) => (
@@ -105,7 +115,7 @@ export function PulsePage() {
         {project.technologies.length > 0 && (
           <Reveal>
             <Meta as="h2" className="mb-4 mt-16">
-              05 — Stack
+              06 — Stack
             </Meta>
             <Body className="max-w-2xl">{project.technologies.join(' · ')}</Body>
           </Reveal>

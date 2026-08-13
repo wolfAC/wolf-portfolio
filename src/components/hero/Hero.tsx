@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { lazy, Suspense, useRef, useState } from 'react'
 import { m, useScroll, useTransform } from 'framer-motion'
 import { usePointer } from '../../hooks/usePointer'
 import { useLowPowerDevice } from '../../hooks/useLowPowerDevice'
+import { useWebglSupported } from '../../hooks/useWebglSupported'
 import { Container } from '../layout/Container'
 import { Body, Meta } from '../typography'
 import { HeroCursorField } from './HeroCursorField'
@@ -9,12 +10,17 @@ import { ScrambleName } from './ScrambleName'
 import { ScrollCue } from './ScrollCue'
 import { site } from '../../data/site'
 
+// three/@react-three/fiber only ever get fetched by visitors who qualify for
+// the 3D tier below — everyone else never pays for this chunk.
+const HeroScene = lazy(() => import('./HeroScene'))
+
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null)
   const [pointerFine] = useState(
     () => typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches,
   )
   const lowPowerDevice = useLowPowerDevice()
+  const webglSupported = useWebglSupported()
   // Pointer-driven parallax chains 9 motion values per frame (name/role/
   // tagline drift + the background grid) — profiled at ~80ms/frame under a
   // throttled CPU, by far the heaviest thing on this page. Skip it on
@@ -43,7 +49,16 @@ export function Hero() {
       ref={sectionRef}
       className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden"
     >
-      {interactive && <HeroCursorField x={x} y={y} scrollDrift={scrollDrift} />}
+      {interactive &&
+        (webglSupported ? (
+          // Falls back to the flat CSS grid while the 3D chunk loads, then
+          // swaps to the wireframe scene once it's ready.
+          <Suspense fallback={<HeroCursorField x={x} y={y} scrollDrift={scrollDrift} />}>
+            <HeroScene x={x} y={y} />
+          </Suspense>
+        ) : (
+          <HeroCursorField x={x} y={y} scrollDrift={scrollDrift} />
+        ))}
 
       <Container className="flex flex-1 flex-col justify-center gap-8 py-section-y">
         <Meta as="p">

@@ -11,7 +11,11 @@ interface AnimatedHeadingProps {
 
 /** Staggered word-reveal for page h1s. */
 export function AnimatedHeading({ lines, as, className }: AnimatedHeadingProps) {
-  const Tag = as || 'h1'
+  // Cast needed for this call site only: TS can't resolve JSX prop types for
+  // a bare `ElementType`-typed value, collapsing them to `never` (a known
+  // TS/@types limitation with this exact as-prop pattern).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const Tag = (as || 'h1') as any
 
   return (
     <Tag className={cn('text-display', className)}>

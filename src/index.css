@@ -34,6 +34,11 @@
   --text-meta--line-height: 1.4;
   --text-meta--letter-spacing: 0.08em;
   --text-meta--font-weight: 500;
+
+  /* Shared "lifted" hover shadow — accent-tinted, soft, wide falloff.
+   * One value so every card component lifts with the same weight instead of
+   * each hand-rolling its own shadow. */
+  --shadow-elevated: 0 24px 48px -24px rgb(255 77 28 / 0.28);
 }
 
 @layer base {
@@ -86,4 +91,24 @@
   ::-webkit-scrollbar-corner {
     background: var(--color-bg);
   }
+
+  /* Static grain — adds tactile depth to the flat dark background. Zero JS,
+   * no animation, so it's safe regardless of prefers-reduced-motion or
+   * useLowPowerDevice; sits just under the custom cursor (z-100) so it
+   * never obscures it, above everything else (nav/overlays/splash) so the
+   * texture reads everywhere, not just the hero. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 95;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@utility glow-accent {
+  box-shadow: var(--shadow-elevated);
 }

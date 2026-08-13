@@ -20,7 +20,7 @@ export function ProductPreviewCard({
   return (
     <li
       id={`project-${project.slug}`}
-      className="scroll-mt-24 border-t border-border py-12 first:border-t-0 first:pt-0"
+      className="group scroll-mt-24 border-t border-border py-12 first:border-t-0 first:pt-0"
     >
       <Meta as="p">{String(index + 1).padStart(2, '0')}</Meta>
 
@@ -32,7 +32,7 @@ export function ProductPreviewCard({
 
       <div
         aria-hidden="true"
-        className="mt-8 flex flex-wrap gap-2 border border-border bg-bg-elevated p-6"
+        className="mt-8 flex flex-wrap gap-2 border border-border bg-bg-elevated p-6 transition-[border-color,box-shadow,transform] duration-300 ease-out group-hover:-translate-y-0.5 group-hover:border-fg group-hover:glow-accent motion-reduce:group-hover:translate-y-0"
       >
         {project.modules.map((module) => (
           <Meta as="span" key={module} className="border border-border px-3 py-1">
