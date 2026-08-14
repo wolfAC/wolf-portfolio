@@ -115,28 +115,36 @@
 
 /* Site-wide cursor spotlight: SpotlightCursor writes --spotlight-x/y (in px,
  * local to each .spotlight-text element's own box) on every rAF-throttled
- * pointermove. The fallback (-9999px) keeps the mask's circle off-element by
- * default, so the red overlay stays fully hidden with zero JS — on
- * coarse-pointer/low-power devices where SpotlightCursor never runs, on
- * elements it hasn't reached yet, and before the first pointer move. */
+ * pointermove. The fallback (-9999px) keeps the gradient's circle off-element
+ * by default, so the accent color never shows — on coarse-pointer/low-power
+ * devices where SpotlightCursor never runs, on elements it hasn't reached
+ * yet, and before the first pointer move.
+ *
+ * A single text render, filled by a background-clip:text gradient — not a
+ * duplicated element masked on top. An earlier version rendered the real
+ * text plus an absolutely-positioned accent-colored duplicate, masked to
+ * only show near the cursor; even at full mask opacity, two independently-
+ * rendered copies of the same glyphs don't register pixel-for-pixel (masking
+ * also forces its own compositing layer, which can shift anti-aliasing), so
+ * small badge/chip text visibly "doubled." background-clip:text has exactly
+ * one glyph render, so that failure mode can't happen.
+ *
+ * `-webkit-text-fill-color: transparent` (not `color: transparent`) is what
+ * makes this work: `color` stays whatever it naturally is, so `currentColor`
+ * below still resolves to the real intended color — every existing
+ * `text-fg`/`text-fg-muted`/etc. override on these components keeps working
+ * unchanged. Also a strictly safer fallback than the old approach: browsers
+ * without background-clip:text support just show the real `color`, not
+ * invisible transparent text. */
 @utility spotlight-text {
-  position: relative;
-}
-
-@utility spotlight-overlay {
-  position: absolute;
-  inset: 0;
-  color: var(--color-accent);
-  -webkit-mask-image: radial-gradient(
+  background-image: radial-gradient(
     160px circle at var(--spotlight-x, -9999px) var(--spotlight-y, -9999px),
-    black 0%,
-    black 20%,
-    transparent 70%
+    var(--color-accent) 0%,
+    var(--color-accent) 78%,
+    currentColor 88%,
+    currentColor 100%
   );
-  mask-image: radial-gradient(
-    160px circle at var(--spotlight-x, -9999px) var(--spotlight-y, -9999px),
-    black 0%,
-    black 20%,
-    transparent 70%
-  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

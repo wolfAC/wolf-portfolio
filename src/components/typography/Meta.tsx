@@ -8,7 +8,6 @@ type MetaProps<T extends ElementType> = {
 export function Meta<T extends ElementType = 'span'>({
   as,
   className,
-  children,
   ...props
 }: MetaProps<T>) {
   // Cast needed for this call site only: TS can't resolve JSX prop types for
@@ -21,13 +20,6 @@ export function Meta<T extends ElementType = 'span'>({
     <Tag
       className={cn('spotlight-text text-meta font-mono uppercase text-fg-muted', className)}
       {...props}
-    >
-      {children}
-      {/* Decorative cursor-spotlight duplicate — hidden from assistive tech,
-       * masked invisible by default (see .spotlight-overlay in index.css). */}
-      <span aria-hidden="true" className="spotlight-overlay pointer-events-none">
-        {children}
-      </span>
-    </Tag>
+    />
   )
 }

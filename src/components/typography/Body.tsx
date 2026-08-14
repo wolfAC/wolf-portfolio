@@ -8,7 +8,6 @@ type BodyProps<T extends ElementType> = {
 export function Body<T extends ElementType = 'p'>({
   as,
   className,
-  children,
   ...props
 }: BodyProps<T>) {
   // Cast needed for this call site only: TS can't resolve JSX prop types for
@@ -17,14 +16,5 @@ export function Body<T extends ElementType = 'p'>({
   // fully typed — only this internal render escapes it.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Tag = (as || 'p') as any
-  return (
-    <Tag className={cn('spotlight-text text-body text-fg-muted', className)} {...props}>
-      {children}
-      {/* Decorative cursor-spotlight duplicate — hidden from assistive tech,
-       * masked invisible by default (see .spotlight-overlay in index.css). */}
-      <span aria-hidden="true" className="spotlight-overlay pointer-events-none">
-        {children}
-      </span>
-    </Tag>
-  )
+  return <Tag className={cn('spotlight-text text-body text-fg-muted', className)} {...props} />
 }
