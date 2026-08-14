@@ -20,8 +20,19 @@ export function HeroCursorField({ x, y, scrollDrift }: HeroCursorFieldProps) {
   return (
     <m.div
       aria-hidden="true"
-      style={{ x: gridX, y: gridY }}
-      className="pointer-events-none absolute inset-[-5%] opacity-[0.06]"
+      style={{
+        x: gridX,
+        y: gridY,
+        // Fades the grid out near the bottom edge, matching HeroScene, so
+        // ScrollCue's text isn't sitting on top of grid lines there.
+        maskImage: 'linear-gradient(to bottom, black 0%, black 80%, transparent 100%)',
+        WebkitMaskImage:
+          'linear-gradient(to bottom, black 0%, black 80%, transparent 100%)',
+      }}
+      // -z-10: same stacking fix as HeroScene — a plain absolute layer with
+      // z-index:auto paints after non-positioned siblings regardless of DOM
+      // order, which would otherwise sit on top of ScrollCue's text/arrow.
+      className="pointer-events-none absolute inset-[-5%] -z-10 opacity-[0.06]"
     >
       <div
         className="h-full w-full"

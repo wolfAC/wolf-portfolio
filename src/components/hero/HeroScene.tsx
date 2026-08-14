@@ -94,7 +94,22 @@ function WireframePlane({ x, y }: HeroSceneProps) {
  * qualify for it — never touches the main bundle for anyone else. */
 export default function HeroScene({ x, y }: HeroSceneProps) {
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+    // Negative z-index (not just DOM order) so this always paints behind the
+    // hero's foreground content — a plain `absolute` layer with z-index:auto
+    // otherwise paints *after* non-positioned in-flow siblings per CSS
+    // stacking rules, regardless of which comes first in the DOM (this hid
+    // ScrollCue's text/arrow underneath the wireframe). The mask also fades
+    // the mesh out near the bottom edge, where ScrollCue sits, so its small
+    // text isn't fighting a dense wireframe right behind it.
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 -z-10"
+      style={{
+        maskImage: 'linear-gradient(to bottom, black 0%, black 80%, transparent 100%)',
+        WebkitMaskImage:
+          'linear-gradient(to bottom, black 0%, black 80%, transparent 100%)',
+      }}
+    >
       <Canvas
         dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}

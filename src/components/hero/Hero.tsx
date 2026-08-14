@@ -71,9 +71,18 @@ export function Hero() {
           </m.span>
           <m.span
             style={{ x: roleX, y: roleY }}
-            className="text-display text-fg-muted"
+            className="spotlight-text text-display text-fg-muted"
           >
             {site.role}
+            {/* Decorative cursor-spotlight duplicate — hidden from assistive
+             * tech, masked invisible by default (see .spotlight-overlay in
+             * index.css). Skipped on the name row above: ScrambleName has
+             * its own hover-driven overlay already, and on the tagline
+             * below: it's already accent-colored, so the effect would be a
+             * no-op there. */}
+            <span aria-hidden="true" className="spotlight-overlay pointer-events-none">
+              {site.role}
+            </span>
           </m.span>
         </h1>
 

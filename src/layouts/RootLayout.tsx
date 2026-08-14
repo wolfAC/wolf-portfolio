@@ -3,11 +3,13 @@ import { SiteNav } from '../components/nav/SiteNav'
 import { SiteFooter } from '../components/footer/SiteFooter'
 import { PageTransition } from '../components/motion/PageTransition'
 import { CustomCursor } from '../components/cursor/CustomCursor'
+import { SpotlightCursor } from '../components/motion/SpotlightCursor'
 
 export function RootLayout() {
   return (
     <div className="flex min-h-screen flex-col">
       <CustomCursor />
+      <SpotlightCursor />
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:text-bg"

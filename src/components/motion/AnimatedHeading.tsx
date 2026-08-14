@@ -18,7 +18,7 @@ export function AnimatedHeading({ lines, as, className }: AnimatedHeadingProps) 
   const Tag = (as || 'h1') as any
 
   return (
-    <Tag className={cn('text-display', className)}>
+    <Tag className={cn('spotlight-text text-display', className)}>
       {lines.map((line, lineIndex) => {
         const words = line.split(' ')
         return (
@@ -41,6 +41,18 @@ export function AnimatedHeading({ lines, as, className }: AnimatedHeadingProps) 
           </span>
         )
       })}
+
+      {/* Decorative cursor-spotlight duplicate — plain/non-animated (the
+       * word-stagger above only needs to play once), hidden from assistive
+       * tech, masked invisible by default (see .spotlight-overlay in
+       * index.css). */}
+      <span aria-hidden="true" className="spotlight-overlay pointer-events-none">
+        {lines.map((line) => (
+          <span key={line} className="block">
+            {line}
+          </span>
+        ))}
+      </span>
     </Tag>
   )
 }

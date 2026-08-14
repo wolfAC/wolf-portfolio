@@ -112,3 +112,31 @@
 @utility glow-accent {
   box-shadow: var(--shadow-elevated);
 }
+
+/* Site-wide cursor spotlight: SpotlightCursor writes --spotlight-x/y (in px,
+ * local to each .spotlight-text element's own box) on every rAF-throttled
+ * pointermove. The fallback (-9999px) keeps the mask's circle off-element by
+ * default, so the red overlay stays fully hidden with zero JS — on
+ * coarse-pointer/low-power devices where SpotlightCursor never runs, on
+ * elements it hasn't reached yet, and before the first pointer move. */
+@utility spotlight-text {
+  position: relative;
+}
+
+@utility spotlight-overlay {
+  position: absolute;
+  inset: 0;
+  color: var(--color-accent);
+  -webkit-mask-image: radial-gradient(
+    160px circle at var(--spotlight-x, -9999px) var(--spotlight-y, -9999px),
+    black 0%,
+    black 20%,
+    transparent 70%
+  );
+  mask-image: radial-gradient(
+    160px circle at var(--spotlight-x, -9999px) var(--spotlight-y, -9999px),
+    black 0%,
+    black 20%,
+    transparent 70%
+  );
+}
