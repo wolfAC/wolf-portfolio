@@ -27,7 +27,7 @@ export function TerminalOverlay({ open, onClose }: TerminalOverlayProps) {
   const [history, setHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState<number | null>(null)
 
-  const prompt = `wolf@portfolio ${currentPath.length ? '~/' + currentPath.join('/') : '~'} $`
+  const prompt = `anbu@portfolio ${currentPath.length ? '~/' + currentPath.join('/') : '~'} $`
 
   useEffect(() => {
     if (!open) return

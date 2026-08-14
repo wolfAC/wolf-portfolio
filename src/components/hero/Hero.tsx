@@ -6,7 +6,6 @@ import { useWebglSupported } from '../../hooks/useWebglSupported'
 import { Container } from '../layout/Container'
 import { Body, Meta } from '../typography'
 import { HeroCursorField } from './HeroCursorField'
-import { ScrambleName } from './ScrambleName'
 import { ScrollCue } from './ScrollCue'
 import { site } from '../../data/site'
 
@@ -66,8 +65,17 @@ export function Hero() {
         </Meta>
 
         <h1 className="flex flex-col">
-          <m.span style={{ x: nameX, y: nameY }} className="text-display text-fg">
-            <ScrambleName defaultText={site.realName} hoverText={site.name} />
+          <m.span
+            style={{ x: nameX, y: nameY }}
+            className="spotlight-text text-display text-fg"
+          >
+            {site.name}
+            {/* Decorative cursor-spotlight duplicate — hidden from assistive
+             * tech, masked invisible by default (see .spotlight-overlay in
+             * index.css). */}
+            <span aria-hidden="true" className="spotlight-overlay pointer-events-none">
+              {site.name}
+            </span>
           </m.span>
           <m.span
             style={{ x: roleX, y: roleY }}
@@ -76,10 +84,8 @@ export function Hero() {
             {site.role}
             {/* Decorative cursor-spotlight duplicate — hidden from assistive
              * tech, masked invisible by default (see .spotlight-overlay in
-             * index.css). Skipped on the name row above: ScrambleName has
-             * its own hover-driven overlay already, and on the tagline
-             * below: it's already accent-colored, so the effect would be a
-             * no-op there. */}
+             * index.css). Skipped on the tagline below: it's already
+             * accent-colored, so the effect would be a no-op there. */}
             <span aria-hidden="true" className="spotlight-overlay pointer-events-none">
               {site.role}
             </span>

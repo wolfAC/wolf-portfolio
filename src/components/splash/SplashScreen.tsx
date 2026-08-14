@@ -1,33 +1,24 @@
 import { useEffect, useState } from 'react'
-import { Display } from '../typography'
+import { Logo } from './Logo'
 import { cn } from '../../lib/cn'
 
 const FADE_MS = 300
-const MIN_VISIBLE_MS = 600
+const VISIBLE_MS = 3000
 
 type Phase = 'visible' | 'fading' | 'gone'
 
 /** Shown on every full page load (not on client-side route changes — this
- * component only mounts once per app bootstrap) while real assets (fonts)
- * load. Waits for both `document.fonts.ready` and a minimum visible
- * duration — fonts are often already cached and ready in well under a
- * millisecond, which without a floor made the splash imperceptible rather
- * than a real loading state. */
+ * component only mounts once per app bootstrap) for a fixed, deliberate
+ * brand moment: the logo path-draws in over VISIBLE_MS, then the whole
+ * overlay fades out. Always exactly this long, regardless of how fast
+ * assets actually load — a brand beat, not a real loading indicator. */
 export function SplashScreen() {
   const [phase, setPhase] = useState<Phase>('visible')
 
   useEffect(() => {
     if (phase !== 'visible') return
-
-    let cancelled = false
-    const minVisible = new Promise((resolve) => window.setTimeout(resolve, MIN_VISIBLE_MS))
-
-    Promise.all([document.fonts.ready, minVisible]).then(() => {
-      if (!cancelled) setPhase('fading')
-    })
-    return () => {
-      cancelled = true
-    }
+    const timeout = window.setTimeout(() => setPhase('fading'), VISIBLE_MS)
+    return () => window.clearTimeout(timeout)
   }, [phase])
 
   useEffect(() => {
@@ -46,7 +37,7 @@ export function SplashScreen() {
       )}
       style={{ transitionDuration: `${FADE_MS}ms` }}
     >
-      <Display>WOLF</Display>
+      <Logo className="h-auto w-40 sm:w-48 md:w-56" />
     </div>
   )
 }

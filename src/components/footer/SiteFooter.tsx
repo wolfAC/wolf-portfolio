@@ -56,7 +56,7 @@ export function SiteFooter() {
             onClick={() => setTerminalOpen(true)}
             className="font-mono text-meta text-fg-muted transition-colors hover:text-accent"
           >
-            &gt; wolf.dev
+            &gt; anbu.dev
           </button>
         </div>
       </Container>

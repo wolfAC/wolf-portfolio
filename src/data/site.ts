@@ -1,6 +1,5 @@
 export const site = {
-  name: 'WOLF',
-  realName: 'ANBU CHEZHIYAN',
+  name: 'ANBU CHEZHIYAN',
   role: 'PRODUCT ENGINEER',
   tagline: 'I BUILD PRODUCTS, NOT JUST WEBSITES.',
   secondary: 'I design and build digital products from idea to production.',

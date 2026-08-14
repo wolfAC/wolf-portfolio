@@ -31,12 +31,12 @@ export function SiteNav() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-bg/90 backdrop-blur">
       <Container className="flex h-16 items-center justify-between gap-4 md:h-20">
-        <Meta as={Link} to="/" onClick={scrollToTop} className="text-fg">
+        <Meta as={Link} to="/" onClick={scrollToTop} className="whitespace-nowrap text-fg">
           {site.name}
         </Meta>
 
         <nav aria-label="Primary" className="hidden md:block">
-          <ul className="flex items-center gap-8">
+          <ul className="flex items-center gap-6 lg:gap-8">
             {navItems.map((item) => (
               <li key={item.label}>
                 {item.homeHash && isHome ? (
