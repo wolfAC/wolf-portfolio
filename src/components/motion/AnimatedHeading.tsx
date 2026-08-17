@@ -18,7 +18,7 @@ export function AnimatedHeading({ lines, as, className }: AnimatedHeadingProps) 
   const Tag = (as || 'h1') as any
 
   return (
-    <Tag className={cn('spotlight-text text-display', className)}>
+    <Tag className={cn('spotlight-text font-display text-display', className)}>
       {lines.map((line, lineIndex) => {
         const words = line.split(' ')
         return (

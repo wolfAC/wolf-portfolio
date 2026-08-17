@@ -1,4 +1,5 @@
 import { Container } from '../layout/Container'
+import { DraftingMark } from '../layout/DraftingMark'
 import { Reveal } from '../motion/Reveal'
 import { SectionTitle, Meta, Body } from '../typography'
 import { ProgressBar } from '../ui/ProgressBar'
@@ -9,7 +10,8 @@ export function CurrentlyBuilding() {
   if (!project) return null
 
   return (
-    <section className="border-t border-border py-section-y">
+    <section className="relative border-t border-border py-section-y">
+      <DraftingMark />
       <Container>
         <Reveal>
           <Meta as="h2">Currently building</Meta>

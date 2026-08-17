@@ -46,6 +46,7 @@ export function Hero() {
   return (
     <section
       ref={sectionRef}
+      data-cursor="hero"
       className="relative flex min-h-[100svh] flex-col justify-between overflow-hidden"
     >
       {interactive &&
@@ -53,7 +54,7 @@ export function Hero() {
           // Falls back to the flat CSS grid while the 3D chunk loads, then
           // swaps to the wireframe scene once it's ready.
           <Suspense fallback={<HeroCursorField x={x} y={y} scrollDrift={scrollDrift} />}>
-            <HeroScene x={x} y={y} />
+            <HeroScene x={x} y={y} scrollYProgress={scrollYProgress} />
           </Suspense>
         ) : (
           <HeroCursorField x={x} y={y} scrollDrift={scrollDrift} />
@@ -67,13 +68,13 @@ export function Hero() {
         <h1 className="flex flex-col">
           <m.span
             style={{ x: nameX, y: nameY }}
-            className="spotlight-text text-display text-fg"
+            className="spotlight-text font-display text-display text-fg"
           >
             {site.name}
           </m.span>
           <m.span
             style={{ x: roleX, y: roleY }}
-            className="spotlight-text text-display text-fg-muted"
+            className="spotlight-text font-display text-display text-fg-muted"
           >
             {site.role}
           </m.span>
@@ -81,7 +82,7 @@ export function Hero() {
 
         <m.p
           style={{ x: taglineX, y: taglineY }}
-          className="text-section max-w-3xl text-accent"
+          className="font-display text-section max-w-3xl text-accent"
         >
           {site.tagline}
         </m.p>

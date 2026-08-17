@@ -16,5 +16,5 @@ export function SectionTitle<T extends ElementType = 'h2'>({
   // fully typed — only this internal render escapes it.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Tag = (as || 'h2') as any
-  return <Tag className={cn('spotlight-text text-section', className)} {...props} />
+  return <Tag className={cn('spotlight-text font-display text-section', className)} {...props} />
 }

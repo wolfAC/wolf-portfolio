@@ -11,7 +11,7 @@ const otherLinks = socialLinks.filter((link) => link.label !== 'EMAIL')
 
 export function ContactPage() {
   return (
-    <SectionShell index="07" title="CONTACT" eyebrowAs="p">
+    <SectionShell index="07" title="CONTACT" eyebrowAs="p" rev="G">
       <Reveal>
         <AnimatedHeading lines={["LET'S TALK", 'ABOUT YOUR', 'NEXT BUILD.']} />
 

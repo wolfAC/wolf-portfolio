@@ -1,6 +1,7 @@
 import type { ElementType, ReactNode } from 'react'
 import { Meta } from '../typography'
 import { Container } from './Container'
+import { DraftingMark } from './DraftingMark'
 import { cn } from '../../lib/cn'
 
 interface SectionShellProps {
@@ -12,6 +13,9 @@ interface SectionShellProps {
   /** Heading level for the "NN / TITLE" eyebrow. Use 'p' when the section
    * provides its own h1 (e.g. a standalone stub page). Defaults to 'h2'. */
   eyebrowAs?: ElementType
+  /** Hand-authored REV stamp letter, e.g. "C" — see DraftingMark. Omit for
+   * the registration cross only, no stamp. */
+  rev?: string
 }
 
 export function SectionShell({
@@ -21,9 +25,11 @@ export function SectionShell({
   children,
   className,
   eyebrowAs = 'h2',
+  rev,
 }: SectionShellProps) {
   return (
-    <section id={id} className={cn('py-section-y scroll-mt-24', className)}>
+    <section id={id} className={cn('relative py-section-y scroll-mt-24', className)}>
+      <DraftingMark rev={rev} />
       <Container>
         <Meta as={eyebrowAs} className="mb-6">
           {index} / {title}

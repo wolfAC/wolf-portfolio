@@ -16,5 +16,10 @@ export function Body<T extends ElementType = 'p'>({
   // fully typed — only this internal render escapes it.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Tag = (as || 'p') as any
-  return <Tag className={cn('spotlight-text text-body text-fg-muted', className)} {...props} />
+  return (
+    <Tag
+      className={cn('spotlight-text font-body text-body text-fg-muted', className)}
+      {...props}
+    />
+  )
 }

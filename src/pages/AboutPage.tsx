@@ -33,7 +33,7 @@ const FOCUS_AREAS = [
 
 export function AboutPage() {
   return (
-    <SectionShell index="06" title="ABOUT" eyebrowAs="p">
+    <SectionShell index="06" title="ABOUT" eyebrowAs="p" rev="F">
       <Reveal>
         <AnimatedHeading lines={['I LIKE BUILDING', 'THINGS THAT', 'ACTUALLY WORK.']} />
 

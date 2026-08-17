@@ -1,6 +1,7 @@
 import { getProjectBySlug } from '../data/projects'
 import { Container } from '../components/layout/Container'
 import { Body, Meta } from '../components/typography'
+import { DraftingMark } from '../components/layout/DraftingMark'
 import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { ProjectPreviewGallery } from '../components/products/ProjectPreviewGallery'
 import { ProjectFlowDiagram } from '../components/products/ProjectFlowDiagram'
@@ -19,7 +20,8 @@ export function PulsePage() {
   }))
 
   return (
-    <article className="py-section-y">
+    <article className="relative py-section-y">
+      <DraftingMark rev="B" />
       <Container>
         <Reveal>
           <Meta as="p" className="mb-6">

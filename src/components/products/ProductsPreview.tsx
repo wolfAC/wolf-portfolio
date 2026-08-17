@@ -7,7 +7,7 @@ export function ProductsPreview() {
   const showcased = projects.filter((project) => project.showcase)
 
   return (
-    <SectionShell id="products" index="02" title="PRODUCTS">
+    <SectionShell id="products" index="02" title="PRODUCTS" rev="B">
       <Reveal>
         <ul>
           {showcased.map((project, index) => (

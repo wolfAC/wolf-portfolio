@@ -16,7 +16,7 @@ export function ProductDetailPage() {
 
   if (!project) {
     return (
-      <SectionShell index="02" title="PRODUCTS" eyebrowAs="p">
+      <SectionShell index="02" title="PRODUCTS" eyebrowAs="p" rev="B">
         <AnimatedHeading lines={['NOT FOUND']} />
         <Body className="mt-6">No product matches &ldquo;{slug}&rdquo;.</Body>
       </SectionShell>
@@ -24,7 +24,7 @@ export function ProductDetailPage() {
   }
 
   return (
-    <SectionShell index="02" title={project.name} eyebrowAs="p">
+    <SectionShell index="02" title={project.name} eyebrowAs="p" rev="B">
       <Reveal>
         <AnimatedHeading lines={project.positioningLines} />
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { projects, type Project } from '../../data/projects'
+import { buildReverseIndex } from '../../lib/buildReverseIndex'
 import { Meta, Body } from '../typography'
 import { FadeSwap } from '../motion/FadeSwap'
 import { cn } from '../../lib/cn'
@@ -11,17 +12,7 @@ interface TechEntry {
 }
 
 function buildTechMap(): TechEntry[] {
-  const map = new Map<string, Project[]>()
-  for (const project of projects) {
-    for (const tech of project.technologies) {
-      const existing = map.get(tech)
-      if (existing) {
-        existing.push(project)
-      } else {
-        map.set(tech, [project])
-      }
-    }
-  }
+  const map = buildReverseIndex(projects, (project) => project.technologies)
   return Array.from(map.entries()).map(([technology, usedBy]) => ({
     technology,
     projects: usedBy,

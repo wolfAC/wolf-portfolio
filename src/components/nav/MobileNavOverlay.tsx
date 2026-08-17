@@ -55,7 +55,7 @@ export function MobileNavOverlay({ open, onClose, isHome }: MobileNavOverlayProp
                 <a
                   href={item.homeHash}
                   onClick={onClose}
-                  className="text-section text-fg"
+                  className="font-display text-section text-fg"
                 >
                   {item.label}
                 </a>
@@ -66,7 +66,7 @@ export function MobileNavOverlay({ open, onClose, isHome }: MobileNavOverlayProp
                     onClose()
                     if (!item.homeHash) scrollToTop()
                   }}
-                  className="text-section text-fg"
+                  className="font-display text-section text-fg"
                 >
                   {item.label}
                 </NavLink>

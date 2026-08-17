@@ -16,5 +16,5 @@ export function Display<T extends ElementType = 'h1'>({
   // fully typed — only this internal render escapes it.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const Tag = (as || 'h1') as any
-  return <Tag className={cn('spotlight-text text-display', className)} {...props} />
+  return <Tag className={cn('spotlight-text font-display text-display', className)} {...props} />
 }

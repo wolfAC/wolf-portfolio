@@ -1,5 +1,6 @@
 import { Container } from '../components/layout/Container'
 import { Meta, Body } from '../components/typography'
+import { DraftingMark } from '../components/layout/DraftingMark'
 import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { buildLog } from '../data/build-log'
 import { Reveal } from '../components/motion/Reveal'
@@ -11,7 +12,8 @@ function formatDate(iso: string) {
 
 export function BuildLogPage() {
   return (
-    <article className="py-section-y">
+    <article className="relative py-section-y">
+      <DraftingMark rev="E" />
       <Container>
         <Reveal>
           <Meta as="p" className="mb-6">

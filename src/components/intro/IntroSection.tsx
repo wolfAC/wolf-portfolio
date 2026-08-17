@@ -4,7 +4,7 @@ import { Reveal } from '../motion/Reveal'
 
 export function IntroSection() {
   return (
-    <SectionShell id="intro" index="01" title="INTRO">
+    <SectionShell id="intro" index="01" title="INTRO" rev="A">
       <Reveal>
         <SectionTitle as="p" className="max-w-3xl">
           I don&apos;t just write code. I design, architect, build, and ship digital

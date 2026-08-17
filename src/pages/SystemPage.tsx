@@ -1,14 +1,16 @@
 import { Container } from '../components/layout/Container'
 import { Body, Meta } from '../components/typography'
+import { DraftingMark } from '../components/layout/DraftingMark'
 import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { SystemFlow } from '../components/system/SystemFlow'
 import { ProductDnaGrid } from '../components/system/ProductDnaGrid'
-import { TechnologyMap } from '../components/system/TechnologyMap'
+import { LivingSystemDiagram } from '../components/system/LivingSystemDiagram'
 import { Reveal } from '../components/motion/Reveal'
 
 export function SystemPage() {
   return (
-    <article className="py-section-y">
+    <article className="relative py-section-y">
+      <DraftingMark rev="D" />
       <Container>
         <Reveal>
           <Meta as="p" className="mb-6">
@@ -39,9 +41,9 @@ export function SystemPage() {
 
         <Reveal>
           <Meta as="h2" className="mb-4 mt-16">
-            03 — Technology Map
+            03 — Living System
           </Meta>
-          <TechnologyMap />
+          <LivingSystemDiagram />
         </Reveal>
       </Container>
     </article>

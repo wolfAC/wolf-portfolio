@@ -6,7 +6,7 @@ import { projects } from '../data/projects'
 
 export function ProductsIndexPage() {
   return (
-    <SectionShell index="02" title="PRODUCTS" eyebrowAs="p">
+    <SectionShell index="02" title="PRODUCTS" eyebrowAs="p" rev="B">
       <AnimatedHeading lines={['PRODUCTS']} />
 
       <ul className="mt-12">

@@ -11,7 +11,7 @@ export function LabDetailPage() {
 
   if (!experiment) {
     return (
-      <SectionShell index="03" title="LAB" eyebrowAs="p">
+      <SectionShell index="03" title="LAB" eyebrowAs="p" rev="C">
         <AnimatedHeading lines={['NOT FOUND']} />
         <Body className="mt-6">No experiment matches &ldquo;{slug}&rdquo;.</Body>
       </SectionShell>
@@ -19,7 +19,7 @@ export function LabDetailPage() {
   }
 
   return (
-    <SectionShell index="03" title={experiment.title} eyebrowAs="p">
+    <SectionShell index="03" title={experiment.title} eyebrowAs="p" rev="C">
       <Reveal>
         <AnimatedHeading lines={[experiment.title]} />
 

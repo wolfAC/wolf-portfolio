@@ -6,7 +6,7 @@ import { Reveal } from '../components/motion/Reveal'
 
 export function LabIndexPage() {
   return (
-    <SectionShell index="03" title="LAB" eyebrowAs="p">
+    <SectionShell index="03" title="LAB" eyebrowAs="p" rev="C">
       <Reveal>
         <AnimatedHeading lines={['LAB']} />
 
