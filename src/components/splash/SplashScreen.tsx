@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Logo } from './Logo'
+import { HannyaMask } from './HannyaMask'
 import { cn } from '../../lib/cn'
 
 const FADE_MS = 300
@@ -9,9 +9,9 @@ type Phase = 'visible' | 'fading' | 'gone'
 
 /** Shown on every full page load (not on client-side route changes — this
  * component only mounts once per app bootstrap) for a fixed, deliberate
- * brand moment: the logo path-draws in over VISIBLE_MS, then the whole
- * overlay fades out. Always exactly this long, regardless of how fast
- * assets actually load — a brand beat, not a real loading indicator. */
+ * brand moment: the hannya mask emblem path-draws in over VISIBLE_MS, then
+ * the whole overlay fades out. Always exactly this long, regardless of how
+ * fast assets actually load — a brand beat, not a real loading indicator. */
 export function SplashScreen() {
   const [phase, setPhase] = useState<Phase>('visible')
 
@@ -37,7 +37,7 @@ export function SplashScreen() {
       )}
       style={{ transitionDuration: `${FADE_MS}ms` }}
     >
-      <Logo className="h-auto w-40 sm:w-48 md:w-56" />
+      <HannyaMask className="h-52 w-52 sm:h-64 sm:w-64 md:h-72 md:w-72" />
     </div>
   )
 }
