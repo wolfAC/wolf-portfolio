@@ -5,6 +5,7 @@ import { AnimatedHeading } from '../components/motion/AnimatedHeading'
 import { SystemFlow } from '../components/system/SystemFlow'
 import { ProductDnaGrid } from '../components/system/ProductDnaGrid'
 import { LivingSystemDiagram } from '../components/system/LivingSystemDiagram'
+import { VoiceQuery } from '../components/system/VoiceQuery'
 import { Reveal } from '../components/motion/Reveal'
 
 export function SystemPage() {
@@ -44,6 +45,7 @@ export function SystemPage() {
             03 — Living System
           </Meta>
           <LivingSystemDiagram />
+          <VoiceQuery />
         </Reveal>
       </Container>
     </article>

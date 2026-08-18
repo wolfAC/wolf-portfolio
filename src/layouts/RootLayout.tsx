@@ -6,6 +6,7 @@ import { CustomCursor } from '../components/cursor/CustomCursor'
 import { SpotlightCursor } from '../components/motion/SpotlightCursor'
 import { BlueprintGrid } from '../components/layout/BlueprintGrid'
 import { DebugModeToggle } from '../components/debug/DebugModeToggle'
+import { SoundToggle } from '../components/debug/SoundToggle'
 
 export function RootLayout() {
   return (
@@ -14,6 +15,7 @@ export function RootLayout() {
       <CustomCursor />
       <SpotlightCursor />
       <DebugModeToggle />
+      <SoundToggle />
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:bg-accent focus:px-4 focus:py-2 focus:text-bg"

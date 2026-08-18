@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { useLocation } from 'react-router'
 import { useMotionValueEvent, type MotionValue } from 'framer-motion'
 import { useDebugMode } from '../../context/DebugModeContext'
+import { useSound } from '../../context/SoundContext'
+import { useQuoteToast } from '../../context/QuoteToastContext'
+import { getQuote } from '../../content/quotes'
 import { cn } from '../../lib/cn'
 
 interface DebugStatProps {
@@ -31,13 +34,22 @@ function DebugStat({ label, value, suffix = '' }: DebugStatProps) {
  * refresh always starts clean). */
 export function DebugModeToggle() {
   const { enabled, toggle, fps, scrollPercent } = useDebugMode()
+  const { playSwitchToggle } = useSound()
+  const { showQuote } = useQuoteToast()
   const location = useLocation()
+  const debugRotateQuote = getQuote('debug-rotate')
+
+  function handleClick() {
+    playSwitchToggle()
+    if (!enabled) showQuote('debug-on')
+    toggle()
+  }
 
   return (
     <>
       <button
         type="button"
-        onClick={toggle}
+        onClick={handleClick}
         aria-pressed={enabled}
         className={cn(
           'fixed bottom-6 right-6 z-50 border bg-bg px-3 py-1.5 font-mono text-meta uppercase tracking-wide transition-colors',
@@ -55,6 +67,7 @@ export function DebugModeToggle() {
           <DebugStat label="FPS" value={fps} />
           <DebugStat label="SCROLL" value={scrollPercent} suffix="%" />
           <div>ROUTE: {location.pathname}</div>
+          {debugRotateQuote ? <div className="mt-1 border-t border-cyan/40 pt-1">{debugRotateQuote}</div> : null}
         </div>
       ) : null}
     </>

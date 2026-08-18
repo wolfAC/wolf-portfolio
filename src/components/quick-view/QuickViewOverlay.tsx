@@ -5,6 +5,7 @@ import { site, socialLinks } from '../../data/site'
 import { projects } from '../../data/projects'
 import { Display, Body, Meta } from '../typography'
 import { Container } from '../layout/Container'
+import { useQuoteToast } from '../../context/QuoteToastContext'
 
 interface QuickViewOverlayProps {
   open: boolean
@@ -13,6 +14,7 @@ interface QuickViewOverlayProps {
 
 export function QuickViewOverlay({ open, onClose }: QuickViewOverlayProps) {
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const { showQuote } = useQuoteToast()
   const showcasedProjects = projects.filter((project) => project.showcase)
 
   useEffect(() => {
@@ -104,6 +106,7 @@ export function QuickViewOverlay({ open, onClose }: QuickViewOverlayProps) {
                 href="/resume.pdf"
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => showQuote('resume-download')}
                 className="text-fg transition-colors hover:text-accent"
               >
                 Resume

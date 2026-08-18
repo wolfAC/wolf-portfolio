@@ -1,9 +1,17 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router'
 import { SectionShell } from '../../components/layout/SectionShell'
 import { Body, Meta } from '../../components/typography'
 import { AnimatedHeading } from '../../components/motion/AnimatedHeading'
+import { useQuoteToast } from '../../context/QuoteToastContext'
 
 export function NotFoundPage() {
+  const { showQuote } = useQuoteToast()
+
+  useEffect(() => {
+    showQuote('404')
+  }, [showQuote])
+
   return (
     <SectionShell index="404" title="NOT FOUND" eyebrowAs="p">
       <AnimatedHeading lines={['PAGE NOT FOUND']} />

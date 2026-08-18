@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
-import { m, useScroll, useTransform, type MotionValue } from 'framer-motion'
+import { m, useMotionValueEvent, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import {
   buildDiagramGraph,
   HUB_ID,
@@ -12,10 +12,14 @@ import {
   type RailNode,
   type SkillNode,
 } from '../../data/livingSystemGraph'
+import { getProjectBySlug } from '../../data/projects'
 import { Meta, Body } from '../typography'
 import { FadeSwap } from '../motion/FadeSwap'
 import { cn } from '../../lib/cn'
 import { useIsDesktopViewport } from '../../hooks/useIsDesktopViewport'
+import { useKeystrokeBuffer } from '../../hooks/useKeystrokeBuffer'
+import { useSound } from '../../context/SoundContext'
+import { CaseStudyThread } from './CaseStudyThread'
 import { LivingSystemDiagramMobile } from './LivingSystemDiagramMobile'
 
 interface Position {
@@ -221,8 +225,12 @@ function PulseEdge({ from, to, xMid, stageRange, scrollYProgress }: PulseEdgePro
  * a 4-tier grid. The static cyan trace is always visible; `PulseEdge`
  * layers a scroll-linked amber reveal on top of it as the diagram scrolls
  * into view (sub-phase 1c). */
+const STAGE_END_THRESHOLDS = Object.values(STAGE_RANGES).map(([, end]) => end)
+
 function DesktopDiagram({ graph }: { graph: DiagramGraph }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [openProjectSlug, setOpenProjectSlug] = useState<string | null>(null)
+  const openProject = openProjectSlug ? (getProjectBySlug(openProjectSlug) ?? null) : null
   const positions = useMemo(() => buildPositions(graph), [graph])
   const bendX = useMemo(() => computeBendX(graph, positions), [graph, positions])
   const selected = graph.nodes.find((node) => node.id === selectedId)
@@ -233,6 +241,42 @@ function DesktopDiagram({ graph }: { graph: DiagramGraph }) {
     target: diagramRef,
     offset: ['start center', 'end center'],
   })
+
+  // One sparse relay-click blip per tier boundary crossed while scrolling
+  // (3 total per full scroll-through), not one per node — 19 individual
+  // node-arrival cues would violate the spec's own "sparse, meaningful
+  // cues only" rule. Un-marking a threshold when scroll drops back below
+  // it lets a later re-approach retrigger it.
+  const { playRelayClick } = useSound()
+  const firedThresholds = useRef<Set<number>>(new Set())
+  useMotionValueEvent(scrollYProgress, 'change', (latest) => {
+    for (const threshold of STAGE_END_THRESHOLDS) {
+      if (latest >= threshold) {
+        if (!firedThresholds.current.has(threshold)) {
+          firedThresholds.current.add(threshold)
+          playRelayClick()
+        }
+      } else {
+        firedThresholds.current.delete(threshold)
+      }
+    }
+  })
+
+  // Skill-bar typing easter egg: lives here (not a global context) since
+  // it only ever means anything while this diagram is on screen. Matches
+  // against the same `techName` the graph already carries — one source of
+  // truth, no separate skills dictionary.
+  const typedBuffer = useKeystrokeBuffer()
+  const matchedSkillIds = useMemo(() => {
+    if (typedBuffer.length < 2) return new Set<string>()
+    const matched = new Set<string>()
+    for (const node of graph.nodes) {
+      if (node.kind === 'skill' && node.techName.toLowerCase().includes(typedBuffer)) {
+        matched.add(node.id)
+      }
+    }
+    return matched
+  }, [typedBuffer, graph])
 
   return (
     <div>
@@ -303,17 +347,18 @@ function DesktopDiagram({ graph }: { graph: DiagramGraph }) {
 
           if (node.kind === 'project') {
             return (
-              <Link
+              <button
                 key={node.id}
-                to={`/products/${node.slug}`}
+                type="button"
+                onClick={() => setOpenProjectSlug(node.slug)}
                 style={style}
-                aria-label={`Project: ${node.label} — ${node.status}, ${node.category}`}
+                aria-label={`Project: ${node.label} — ${node.status}, ${node.category}. Opens case study.`}
                 data-debug-label={`diagram-node--${node.slug} (${node.status})`}
                 data-cursor="node"
                 className="absolute max-w-36 -translate-x-1/2 -translate-y-1/2 border border-border bg-bg px-3 py-2 text-center text-fg transition-colors hover:border-accent hover:text-accent"
               >
                 <Meta as="span">{node.label}</Meta>
-              </Link>
+              </button>
             )
           }
 
@@ -325,6 +370,7 @@ function DesktopDiagram({ graph }: { graph: DiagramGraph }) {
           const hasConnections = node.kind === 'rail' || connectionCount > 0
           const debugValue = node.kind === 'skill' ? node.techName : node.value
           const debugLabel = `diagram-node--${debugValue} (connections: ${connectionCount})`
+          const isMatched = matchedSkillIds.has(node.id)
 
           return (
             <button
@@ -341,6 +387,7 @@ function DesktopDiagram({ graph }: { graph: DiagramGraph }) {
               className={cn(
                 'absolute -translate-x-1/2 -translate-y-1/2 border bg-bg text-center transition-colors',
                 node.kind === 'rail' ? 'px-2 py-1' : 'max-w-36 px-3 py-2',
+                isMatched && 'ring-2 ring-accent animate-pulse',
                 isSelected
                   ? 'border-accent text-accent'
                   : hasConnections
@@ -353,6 +400,12 @@ function DesktopDiagram({ graph }: { graph: DiagramGraph }) {
           )
         })}
       </div>
+
+      <Meta as="p" className="mt-6 text-center text-fg-muted">
+        {matchedSkillIds.size > 0
+          ? `Matched: ${typedBuffer.toUpperCase()}`
+          : 'psst — try typing a technology name'}
+      </Meta>
 
       <div aria-live="polite" className="mt-16 min-h-16 border-t border-border pt-8">
         <FadeSwap swapKey={selectedId ?? 'empty'}>
@@ -386,6 +439,8 @@ function DesktopDiagram({ graph }: { graph: DiagramGraph }) {
           )}
         </FadeSwap>
       </div>
+
+      <CaseStudyThread project={openProject} onClose={() => setOpenProjectSlug(null)} />
     </div>
   )
 }

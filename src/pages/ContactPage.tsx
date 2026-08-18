@@ -5,11 +5,14 @@ import { Reveal } from '../components/motion/Reveal'
 import { ArrowIcon } from '../components/ui/icons'
 import { ContactForm } from '../components/contact/ContactForm'
 import { site, socialLinks } from '../data/site'
+import { useQuoteToast } from '../context/QuoteToastContext'
 
 const emailLink = socialLinks.find((link) => link.label === 'EMAIL')
 const otherLinks = socialLinks.filter((link) => link.label !== 'EMAIL')
 
 export function ContactPage() {
+  const { showQuote } = useQuoteToast()
+
   return (
     <SectionShell index="07" title="CONTACT" eyebrowAs="p" rev="G">
       <Reveal>
@@ -59,6 +62,7 @@ export function ContactPage() {
               href="/resume.pdf"
               target="_blank"
               rel="noreferrer"
+              onClick={() => showQuote('resume-download')}
               className="group inline-flex items-center gap-2 text-fg transition-colors hover:text-accent"
             >
               <Meta as="span">Resume</Meta>
