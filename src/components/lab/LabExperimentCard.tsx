@@ -25,7 +25,7 @@ export function LabExperimentCard({
 
       <Body className="mt-2 max-w-xl">{experiment.description}</Body>
 
-      <ul className="mt-6 flex flex-wrap gap-2 border border-border bg-bg-elevated p-6 transition-[border-color,box-shadow,transform] duration-300 ease-out group-hover:-translate-y-0.5 group-hover:border-fg group-hover:glow-accent motion-reduce:group-hover:translate-y-0">
+      <ul className="mt-6 flex flex-wrap gap-2 border border-border bg-bg-elevated p-6 transition-[border-color,box-shadow,transform] duration-300 ease-out group-hover:-translate-y-0.5 group-hover:border-fg group-hover:glow-accent">
         {experiment.technologies.map((tech) => (
           <li key={tech}>
             <Meta as="span" className="border border-border px-3 py-1">

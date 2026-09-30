@@ -9,7 +9,7 @@ export function ScrollCue() {
         className="flex flex-col items-center gap-2 text-fg-muted transition-colors hover:text-fg"
       >
         <Meta as="span">SCROLL</Meta>
-        <ArrowIcon className="size-4 rotate-90 animate-bounce motion-reduce:animate-none" />
+        <ArrowIcon className="size-4 rotate-90 animate-bounce" />
       </a>
     </div>
   )

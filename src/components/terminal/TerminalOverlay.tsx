@@ -140,7 +140,7 @@ export function TerminalOverlay({ open, onClose }: TerminalOverlayProps) {
           />
           <span
             aria-hidden="true"
-            className="h-4 w-2 animate-pulse bg-accent motion-reduce:animate-none"
+            className="h-4 w-2 animate-pulse bg-accent"
           />
         </form>
 

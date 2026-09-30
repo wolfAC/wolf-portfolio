@@ -16,7 +16,7 @@ export function ProgressBar({ value, label }: ProgressBarProps) {
       className="h-2 w-full overflow-hidden border border-border bg-bg-elevated"
     >
       <div
-        className="h-full bg-accent transition-[width] duration-700 ease-out motion-reduce:transition-none"
+        className="h-full bg-accent transition-[width] duration-700 ease-out"
         style={{ width: `${clamped}%` }}
       />
     </div>

@@ -63,7 +63,7 @@ export function ProjectPreviewGallery({ modules, className }: ProjectPreviewGall
         return (
           <li
             key={module}
-            className="group relative flex aspect-video w-[min(80vw,420px)] flex-none snap-start flex-col justify-between overflow-hidden border border-border p-6 transition-[border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] hover:border-fg hover:glow-accent motion-reduce:hover:translate-y-0 motion-reduce:hover:scale-100"
+            className="group relative flex aspect-video w-[min(80vw,420px)] flex-none snap-start flex-col justify-between overflow-hidden border border-border p-6 transition-[border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-1 hover:scale-[1.02] hover:border-fg hover:glow-accent"
             style={{
               backgroundImage: `linear-gradient(${angle}deg, var(--color-bg-elevated), var(--color-bg))`,
             }}

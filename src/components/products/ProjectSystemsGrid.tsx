@@ -11,7 +11,7 @@ export function ProjectSystemsGrid({ systems }: ProjectSystemsGridProps) {
       {systems.map((system) => (
         <li
           key={system.id}
-          className="border border-border bg-bg-elevated p-6 transition-[border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-fg hover:glow-accent motion-reduce:hover:translate-y-0"
+          className="border border-border bg-bg-elevated p-6 transition-[border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-fg hover:glow-accent"
         >
           <Meta as="p" className="text-fg">
             {system.label}
